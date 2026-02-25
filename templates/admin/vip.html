@@ -1,0 +1,1374 @@
+{{define "content"}}
+<div class="vip-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <h2><i class="fas fa-crown"></i> VIP Yönetimi</h2>
+            <p>VIP üyelikleri yönetin, satışları görüntüleyin ve istatistikleri takip edin</p>
+        </div>
+        <div class="header-right">
+            <button class="btn-primary" onclick="exportVIPData()">
+                <i class="fas fa-download"></i> Rapor Al
+            </button>
+        </div>
+    </div>
+
+    <!-- VIP İstatistik Kartları -->
+    <div class="vip-stats-grid">
+        <div class="vip-stat-card">
+            <div class="vip-stat-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="vip-stat-content">
+                <div class="vip-stat-value">{{.Stats.TotalVIP}}</div>
+                <div class="vip-stat-label">Toplam VIP</div>
+            </div>
+        </div>
+
+        <div class="vip-stat-card">
+            <div class="vip-stat-icon" style="border-color: #00ff9d;">
+                <i class="fas fa-user-check" style="color: #00ff9d;"></i>
+            </div>
+            <div class="vip-stat-content">
+                <div class="vip-stat-value">{{.Stats.ActiveVIP}}</div>
+                <div class="vip-stat-label">Aktif VIP</div>
+            </div>
+        </div>
+
+        <div class="vip-stat-card">
+            <div class="vip-stat-icon" style="border-color: #ffd700;">
+                <i class="fas fa-coins" style="color: #ffd700;"></i>
+            </div>
+            <div class="vip-stat-content">
+                <div class="vip-stat-value">{{.Stats.TotalRevenue | formatMoney}}</div>
+                <div class="vip-stat-label">Toplam Gelir</div>
+            </div>
+        </div>
+
+        <div class="vip-stat-card">
+            <div class="vip-stat-icon" style="border-color: #00b8ff;">
+                <i class="fas fa-chart-line" style="color: #00b8ff;"></i>
+            </div>
+            <div class="vip-stat-content">
+                <div class="vip-stat-value">{{.Stats.MonthlyRevenue | formatMoney}}</div>
+                <div class="vip-stat-label">Aylık Gelir</div>
+            </div>
+        </div>
+
+        <div class="vip-stat-card">
+            <div class="vip-stat-icon" style="border-color: #ffbd2e;">
+                <i class="fas fa-clock" style="color: #ffbd2e;"></i>
+            </div>
+            <div class="vip-stat-content">
+                <div class="vip-stat-value">{{.Stats.ExpiringSoon}}</div>
+                <div class="vip-stat-label">Yakında Bitecek</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP Satış Grafiği -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-bar"></i> VIP Satış Grafiği (Son 30 Gün)
+            </h3>
+            <div class="chart-actions">
+                <button class="chart-btn active" onclick="changeChartPeriod('week')">Hafta</button>
+                <button class="chart-btn" onclick="changeChartPeriod('month')">Ay</button>
+                <button class="chart-btn" onclick="changeChartPeriod('year')">Yıl</button>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="vipSalesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- VIP Paketleri Bölümü -->
+    <div class="packages-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-tags"></i> VIP Paketleri
+            </h3>
+            <button class="btn-add" onclick="showAddPackageModal()">
+                <i class="fas fa-plus"></i> Yeni Paket Ekle
+            </button>
+        </div>
+
+        {{if .Packages}}
+        <div class="packages-grid">
+            {{range .Packages}}
+            <div class="package-card">
+                <div class="package-header">
+                    <h4>{{.Name}}</h4>
+                    <div class="package-price">{{.Price | formatMoney}}</div>
+                </div>
+                <div class="package-body">
+                    <div class="package-duration">
+                        <i class="fas fa-clock"></i> {{.DurationDays}} Gün
+                    </div>
+                    <div class="package-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Tüm makinelere erişim</li>
+                            <li><i class="fas fa-check"></i> Öncelikli destek</li>
+                            {{if gt .DurationDays 30}}
+                            <li><i class="fas fa-check"></i> %{{calculateDiscount .DurationDays}} indirim</li>
+                            {{end}}
+                        </ul>
+                    </div>
+                    <div class="package-stats">
+                        <span class="stat">
+                            <i class="fas fa-users"></i> {{.SubscriberCount}} aktif
+                        </span>
+                        <span class="stat">
+                            <i class="fas fa-shopping-cart"></i> {{.PurchaseCount}} satış
+                        </span>
+                    </div>
+                    <div class="package-actions">
+                        <button class="btn-icon" onclick="editPackage({{.ID}})" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon" onclick="togglePackage({{.ID}})" 
+                                title="{{if .IsActive}}Pasif Yap{{else}}Aktif Yap{{end}}">
+                            <i class="fas {{if .IsActive}}fa-toggle-on{{else}}fa-toggle-off{{end}}"></i>
+                        </button>
+                        <button class="btn-icon btn-danger" onclick="deletePackage({{.ID}})" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {{if not .IsActive}}
+                <div class="package-badge inactive">PASİF</div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="empty-packages">
+            <i class="fas fa-tags"></i>
+            <h3>Henüz VIP Paketi Yok</h3>
+            <p>Yeni bir VIP paketi eklemek için "Yeni Paket Ekle" butonuna tıklayın.</p>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Son VIP Satışları -->
+    <div class="recent-sales">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-history"></i> Son VIP Satışları
+            </h3>
+            <a href="/admin/vip/purchases" class="view-all">
+                Tümünü Gör <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        {{if .Purchases}}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kullanıcı</th>
+                        <th>Paket</th>
+                        <th>Fiyat</th>
+                        <th>Satın Alma Tarihi</th>
+                        <th>Bitiş Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Purchases}}
+                    <tr>
+                        <td>#{{.ID}}</td>
+                        <td>
+                            <div class="user-info">
+                                <img src="{{.UserAvatar}}" alt="{{.Username}}" class="user-avatar">
+                                <span>{{.Username}}</span>
+                            </div>
+                        </td>
+                        <td>{{.PlanName}}</td>
+                        <td class="price">{{.Price | formatMoney}}</td>
+                        <td>{{.PurchasedAt | formatDate}}</td>
+                        <td>{{.ExpiryDate | formatDate}}</td>
+                        <td>
+                            {{if .IsActive}}
+                            <span class="badge badge-success">
+                                <i class="fas fa-check-circle"></i> Aktif
+                            </span>
+                            {{else}}
+                            <span class="badge badge-danger">
+                                <i class="fas fa-times-circle"></i> Süresi Doldu
+                            </span>
+                            {{end}}
+                        </td>
+                        <td class="actions">
+                            <button class="btn-icon" onclick="viewUser({{.UserID}})" title="Kullanıcıyı Gör">
+                                <i class="fas fa-user"></i>
+                            </button>
+                            <button class="btn-icon" onclick="extendVIP({{.ID}})" title="Süre Uzat">
+                                <i class="fas fa-clock"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="empty-sales">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Henüz Satış Yok</h3>
+            <p>VIP satışları burada görüntülenecek.</p>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Yakında Bitecek VIP'ler -->
+    <div class="expiring-soon">
+        <h3 class="section-title">
+            <i class="fas fa-exclamation-triangle" style="color: #ffbd2e;"></i>
+            Yakında Bitecek VIP'ler (7 Gün)
+        </h3>
+
+        {{if .ExpiringVIPs}}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Email</th>
+                        <th>Paket</th>
+                        <th>Bitiş Tarihi</th>
+                        <th>Kalan Gün</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .ExpiringVIPs}}
+                    <tr>
+                        <td>{{.Username}}</td>
+                        <td>{{.Email}}</td>
+                        <td>{{.PlanName}}</td>
+                        <td>{{.ExpiryDate | formatDate}}</td>
+                        <td>
+                            <span class="days-left {{if lt .DaysLeft 3}}critical{{end}}">
+                                {{.DaysLeft}} gün
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button class="btn-icon" onclick="sendReminder({{.ID}})" title="Hatırlatma Gönder">
+                                <i class="fas fa-bell"></i>
+                            </button>
+                            <button class="btn-icon" onclick="extendVIP({{.ID}})" title="Süre Uzat">
+                                <i class="fas fa-clock"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="empty-state">
+            <p>Yakında bitecek VIP üyelik bulunmuyor.</p>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Yeni Paket Ekleme Modalı -->
+    <div id="packageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Yeni VIP Paketi Ekle</h3>
+                <button class="modal-close" onclick="closePackageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="packageForm">
+                    <input type="hidden" id="packageId" name="packageId">
+                    
+                    <div class="form-group">
+                        <label>Paket Adı <span class="required">*</span></label>
+                        <input type="text" id="packageName" name="name" required 
+                               placeholder="Örn: Aylık VIP, Yıllık VIP">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Fiyat (₺) <span class="required">*</span></label>
+                            <input type="number" id="packagePrice" name="price" 
+                                   step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Süre (Gün) <span class="required">*</span></label>
+                            <input type="number" id="packageDuration" name="duration_days" 
+                                   min="1" max="365" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Açıklama</label>
+                        <textarea id="packageDescription" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Özellikler</label>
+                        <div class="features-list" id="featuresList">
+                            <div class="feature-item">
+                                <input type="text" name="features[]" placeholder="Örn: Tüm makinelere erişim">
+                                <button type="button" class="btn-remove-feature" onclick="removeFeature(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-add-feature" onclick="addFeature()">
+                            <i class="fas fa-plus"></i> Özellik Ekle
+                        </button>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>Aktif</span>
+                            <label class="switch">
+                                <input type="checkbox" id="packageActive" name="is_active" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closePackageModal()">İptal</button>
+                <button type="button" class="btn-primary" onclick="savePackage()">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .vip-page {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        margin-bottom: 0.3rem;
+    }
+
+    .header-left p {
+        color: #6a7a8a;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        border: none;
+        border-radius: 8px;
+        color: #0a0f0f;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
+    }
+
+    .vip-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .vip-stat-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: 0.3s;
+    }
+
+    .vip-stat-card:hover {
+        border-color: #00ff9d;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0, 255, 157, 0.2);
+    }
+
+    .vip-stat-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid #ffd700;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #ffd700;
+    }
+
+    .vip-stat-content {
+        flex: 1;
+    }
+
+    .vip-stat-value {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1.8rem;
+        color: #00ff9d;
+        line-height: 1.2;
+    }
+
+    .vip-stat-label {
+        color: #b0b0b0;
+        font-size: 0.8rem;
+    }
+
+    .chart-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .chart-title {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-size: 1.1rem;
+    }
+
+    .chart-title i {
+        margin-right: 0.5rem;
+    }
+
+    .chart-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .chart-btn {
+        padding: 0.3rem 1rem;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .chart-btn:hover,
+    .chart-btn.active {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .packages-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-title {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-size: 1.2rem;
+    }
+
+    .section-title i {
+        margin-right: 0.5rem;
+    }
+
+    .btn-add {
+        padding: 0.5rem 1.5rem;
+        background: transparent;
+        border: 1px solid #00ff9d;
+        border-radius: 5px;
+        color: #00ff9d;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-add:hover {
+        background: rgba(0, 255, 157, 0.1);
+    }
+
+    .packages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .package-card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        transition: 0.3s;
+    }
+
+    .package-card:hover {
+        border-color: #ffd700;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+    }
+
+    .package-header {
+        background: linear-gradient(135deg, #ffd700, #ffa500);
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .package-header h4 {
+        color: #0a0f0f;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .package-price {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 2rem;
+        color: #0a0f0f;
+    }
+
+    .package-body {
+        padding: 1.5rem;
+    }
+
+    .package-duration {
+        text-align: center;
+        color: #b0b0b0;
+        margin-bottom: 1rem;
+    }
+
+    .package-duration i {
+        color: #ffd700;
+        margin-right: 0.5rem;
+    }
+
+    .package-features ul {
+        list-style: none;
+        margin-bottom: 1rem;
+    }
+
+    .package-features li {
+        color: #b0b0b0;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .package-features i {
+        color: #00ff9d;
+        margin-right: 0.5rem;
+    }
+
+    .package-stats {
+        display: flex;
+        justify-content: space-around;
+        padding: 1rem 0;
+        border-top: 1px solid #2a3a4a;
+        border-bottom: 1px solid #2a3a4a;
+        margin-bottom: 1rem;
+    }
+
+    .package-stats .stat {
+        color: #b0b0b0;
+        font-size: 0.8rem;
+    }
+
+    .package-stats i {
+        color: #00ff9d;
+        margin-right: 0.3rem;
+    }
+
+    .package-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .package-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.3rem 1rem;
+        background: rgba(255, 95, 86, 0.9);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transform: rotate(5deg);
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 8px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-icon:hover {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .btn-icon.btn-danger:hover {
+        border-color: #ff5f56;
+        color: #ff5f56;
+    }
+
+    .empty-packages,
+    .empty-sales {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .empty-packages i,
+    .empty-sales i {
+        font-size: 3rem;
+        color: #2a3a4a;
+        margin-bottom: 1rem;
+    }
+
+    .empty-packages h3,
+    .empty-sales h3 {
+        color: #b0b0b0;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-packages p,
+    .empty-sales p {
+        color: #6a7a8a;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: rgba(0, 255, 157, 0.1);
+        padding: 1rem;
+        text-align: left;
+        color: #00ff9d;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .data-table tr:hover {
+        background: rgba(0, 255, 157, 0.05);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #00ff9d;
+    }
+
+    .price {
+        font-family: 'Share Tech Mono', monospace;
+        color: #ffd700;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: rgba(0, 255, 157, 0.2);
+        color: #00ff9d;
+        border: 1px solid #00ff9d;
+    }
+
+    .badge-danger {
+        background: rgba(255, 95, 86, 0.2);
+        color: #ff5f56;
+        border: 1px solid #ff5f56;
+    }
+
+    .days-left {
+        font-weight: 600;
+    }
+
+    .days-left.critical {
+        color: #ff5f56;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+
+    .view-all {
+        color: #b0b0b0;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .view-all:hover {
+        color: #00ff9d;
+    }
+
+    .expiring-soon {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6a7a8a;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        overflow: auto;
+    }
+
+    .modal-content {
+        background: #1a1f2f;
+        margin: 5% auto;
+        border: 1px solid #00ff9d;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 600px;
+        animation: modalSlideIn 0.3s;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #2a3a4a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        color: #00ff9d;
+        font-family: 'Share Tech Mono', monospace;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #6a7a8a;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .modal-close:hover {
+        color: #ff5f56;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #2a3a4a;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #b0b0b0;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #e0e0e0;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #00ff9d;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .half {
+        flex: 1;
+    }
+
+    .required {
+        color: #ff5f56;
+    }
+
+    .features-list {
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item input {
+        flex: 1;
+    }
+
+    .btn-remove-feature {
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: 1px solid #ff5f56;
+        border-radius: 5px;
+        color: #ff5f56;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-remove-feature:hover {
+        background: #ff5f56;
+        color: #fff;
+    }
+
+    .btn-add-feature {
+        width: 100%;
+        padding: 0.5rem;
+        background: transparent;
+        border: 1px dashed #00ff9d;
+        border-radius: 5px;
+        color: #00ff9d;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-add-feature:hover {
+        background: rgba(0, 255, 157, 0.1);
+    }
+
+    .toggle-group {
+        margin-top: 1rem;
+    }
+
+    .toggle-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #2a3a4a;
+        transition: .3s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #00ff9d;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .btn-secondary {
+        padding: 0.8rem 1.5rem;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 8px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-secondary:hover {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    @media (max-width: 768px) {
+        .vip-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .packages-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let vipChart;
+    let currentPeriod = 'month';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initVipChart();
+    });
+
+    function initVipChart() {
+        const ctx = document.getElementById('vipSalesChart').getContext('2d');
+        
+        // Örnek veriler - gerçek veriler API'den gelecek
+        const data = {
+            week: {
+                labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+                values: [1200, 1900, 800, 1600, 2100, 2400, 1800]
+            },
+            month: {
+                labels: ['1. Hafta', '2. Hafta', '3. Hafta', '4. Hafta'],
+                values: [8500, 10200, 9500, 11800]
+            },
+            year: {
+                labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+                values: [12500, 14800, 13200, 15800, 17200, 19500, 18200, 16800, 15400, 17100, 18800, 21200]
+            }
+        };
+
+        vipChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.month.labels,
+                datasets: [{
+                    label: 'VIP Satışları (₺)',
+                    data: data.month.values,
+                    borderColor: '#ffd700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ffd700',
+                    pointBorderColor: '#0a0f0f',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#b0b0b0'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '₺' + context.raw.toLocaleString('tr-TR');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#2a3a4a'
+                        },
+                        ticks: {
+                            color: '#b0b0b0',
+                            callback: function(value) {
+                                return '₺' + value.toLocaleString('tr-TR');
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#b0b0b0'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function changeChartPeriod(period) {
+        currentPeriod = period;
+        
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Gerçek uygulamada API'den veri çekilecek
+        const data = {
+            week: [1200, 1900, 800, 1600, 2100, 2400, 1800],
+            month: [8500, 10200, 9500, 11800],
+            year: [12500, 14800, 13200, 15800, 17200, 19500, 18200, 16800, 15400, 17100, 18800, 21200]
+        };
+
+        const labels = {
+            week: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+            month: ['1. Hafta', '2. Hafta', '3. Hafta', '4. Hafta'],
+            year: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+        };
+
+        vipChart.data.labels = labels[period];
+        vipChart.data.datasets[0].data = data[period];
+        vipChart.update();
+    }
+
+    // Paket işlemleri
+    function showAddPackageModal() {
+        document.getElementById('modalTitle').textContent = 'Yeni VIP Paketi Ekle';
+        document.getElementById('packageForm').reset();
+        document.getElementById('packageId').value = '';
+        document.getElementById('featuresList').innerHTML = `
+            <div class="feature-item">
+                <input type="text" name="features[]" placeholder="Örn: Tüm makinelere erişim">
+                <button type="button" class="btn-remove-feature" onclick="removeFeature(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        document.getElementById('packageModal').style.display = 'block';
+    }
+
+    function closePackageModal() {
+        document.getElementById('packageModal').style.display = 'none';
+    }
+
+    function editPackage(id) {
+        document.getElementById('modalTitle').textContent = 'VIP Paketi Düzenle';
+        document.getElementById('packageId').value = id;
+        
+        // Gerçek uygulamada API'den veri çekilecek
+        document.getElementById('packageName').value = 'Aylık VIP';
+        document.getElementById('packagePrice').value = '99.90';
+        document.getElementById('packageDuration').value = '30';
+        document.getElementById('packageDescription').value = '1 aylık VIP üyelik paketi';
+        document.getElementById('packageActive').checked = true;
+        
+        document.getElementById('packageModal').style.display = 'block';
+    }
+
+    function togglePackage(id) {
+        if (confirm('Paket durumunu değiştirmek istediğinize emin misiniz?')) {
+            // API çağrısı
+            console.log('Toggle package:', id);
+            showNotification('Paket durumu güncellendi!', 'success');
+        }
+    }
+
+    function deletePackage(id) {
+        if (confirm('Bu paketi silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+            // API çağrısı
+            console.log('Delete package:', id);
+            showNotification('Paket silindi!', 'success');
+        }
+    }
+
+    function savePackage() {
+        const form = document.getElementById('packageForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        console.log('Saving package:', data);
+        showNotification('Paket kaydedildi!', 'success');
+        closePackageModal();
+    }
+
+    // Feature işlemleri
+    function addFeature() {
+        const featuresList = document.getElementById('featuresList');
+        const featureItem = document.createElement('div');
+        featureItem.className = 'feature-item';
+        featureItem.innerHTML = `
+            <input type="text" name="features[]" placeholder="Örn: Öncelikli destek">
+            <button type="button" class="btn-remove-feature" onclick="removeFeature(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        featuresList.appendChild(featureItem);
+    }
+
+    function removeFeature(button) {
+        const featureItem = button.closest('.feature-item');
+        if (document.querySelectorAll('.feature-item').length > 1) {
+            featureItem.remove();
+        } else {
+            showNotification('En az bir özellik olmalıdır!', 'error');
+        }
+    }
+
+    // VIP işlemleri
+    function viewUser(id) {
+        window.location.href = `/admin/users/${id}`;
+    }
+
+    function extendVIP(id) {
+        const days = prompt('Kaç gün uzatmak istiyorsunuz?', '30');
+        if (days && !isNaN(days) && days > 0) {
+            console.log('Extend VIP:', id, days);
+            showNotification(`VIP süresi ${days} gün uzatıldı!`, 'success');
+        }
+    }
+
+    function sendReminder(id) {
+        if (confirm('Kullanıcıya hatırlatma maili gönderilsin mi?')) {
+            console.log('Send reminder:', id);
+            showNotification('Hatırlatma maili gönderildi!', 'success');
+        }
+    }
+
+    function exportVIPData() {
+        // Rapor oluştur
+        const data = [
+            ['Tarih', 'Satış Sayısı', 'Toplam Gelir'],
+            ['2024-01-01', '5', '499.50'],
+            ['2024-01-02', '3', '299.70'],
+            ['2024-01-03', '7', '699.30']
+        ];
+        
+        let csv = data.map(row => row.join(',')).join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vip-rapor-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showNotification('Rapor oluşturuldu!', 'success');
+    }
+
+    // İndirim hesaplama
+    function calculateDiscount(days) {
+        if (days >= 365) return 25;
+        if (days >= 90) return 15;
+        if (days >= 30) return 0;
+        return 0;
+    }
+
+    // Bildirim göster
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Modal dışına tıklanınca kapat
+    window.onclick = function(event) {
+        const modal = document.getElementById('packageModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Format helpers (template fonksiyonları için mock)
+    window.formatMoney = function(amount) {
+        return '₺' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    window.formatDate = function(date) {
+        return new Date(date).toLocaleDateString('tr-TR');
+    }
+</script>
+
+<style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideIn 0.3s;
+    }
+
+    .notification.success {
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        color: #0a0f0f;
+    }
+
+    .notification.error {
+        background: linear-gradient(45deg, #ff5f56, #ff3333);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+{{end}}

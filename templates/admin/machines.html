@@ -1,0 +1,466 @@
+{{define "content"}}
+<div class="machines-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <h2><i class="fas fa-server"></i> Makine Yönetimi</h2>
+            <p>Platformdaki tüm makineleri yönetin, düzenleyin ve izleyin</p>
+        </div>
+        <div class="header-right">
+            <a href="/admin/machines/add" class="btn-primary">
+                <i class="fas fa-plus"></i> Yeni Makine Ekle
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtre ve Arama -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label>Zorluk:</label>
+            <select id="difficultyFilter" class="filter-select">
+                <option value="all">Tümü</option>
+                <option value="easy">Kolay</option>
+                <option value="medium">Orta</option>
+                <option value="hard">Zor</option>
+                <option value="expert">Uzman</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>Durum:</label>
+            <select id="statusFilter" class="filter-select">
+                <option value="all">Tümü</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>VIP:</label>
+            <select id="vipFilter" class="filter-select">
+                <option value="all">Tümü</option>
+                <option value="vip">Sadece VIP</option>
+                <option value="free">Ücretsiz</option>
+            </select>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Makine ara..." class="search-input">
+        </div>
+
+        <button class="btn-filter" onclick="applyFilters()">
+            <i class="fas fa-filter"></i> Filtrele
+        </button>
+    </div>
+
+    <!-- İstatistik Kartları (Mini) -->
+    <div class="mini-stats">
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.TotalMachines}}</span>
+            <span class="mini-stat-label">Toplam Makine</span>
+        </div>
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.ActiveMachines}}</span>
+            <span class="mini-stat-label">Aktif</span>
+        </div>
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.EasyCount}}</span>
+            <span class="mini-stat-label">Kolay</span>
+        </div>
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.MediumCount}}</span>
+            <span class="mini-stat-label">Orta</span>
+        </div>
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.HardCount}}</span>
+            <span class="mini-stat-label">Zor</span>
+        </div>
+        <div class="mini-stat">
+            <span class="mini-stat-value">{{.Stats.ExpertCount}}</span>
+            <span class="mini-stat-label">Uzman</span>
+        </div>
+    </div>
+
+    <!-- Makine Tablosu -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Makine</th>
+                    <th>Zorluk</th>
+                    <th>Puan</th>
+                    <th>VIP</th>
+                    <th>Sorular</th>
+                    <th>Çözümler</th>
+                    <th>Oluşturan</th>
+                    <th>Durum</th>
+                    <th>Eklenme</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Machines}}
+                <tr>
+                    <td>#{{.ID}}</td>
+                    <td>
+                        <div class="machine-name">
+                            <img src="{{.ImageURL}}" alt="{{.Name}}" class="machine-icon">
+                            <span>{{.Name}}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="difficulty-badge difficulty-{{.Difficulty}}">
+                            {{.Difficulty | title}}
+                        </span>
+                    </td>
+                    <td><span class="points">{{.PointsReward}}</span></td>
+                    <td>
+                        {{if .IsVIPOnly}}
+                        <span class="badge badge-vip">VIP</span>
+                        {{else}}
+                        <span class="badge">-</span>
+                        {{end}}
+                    </td>
+                    <td><span class="badge">{{.TotalQuestions}}</span></td>
+                    <td><span class="badge">{{.SolverCount}}</span></td>
+                    <td>{{.Creator}}</td>
+                    <td>
+                        {{if .IsActive}}
+                        <span class="status-badge status-active">Aktif</span>
+                        {{else}}
+                        <span class="status-badge status-inactive">Pasif</span>
+                        {{end}}
+                    </td>
+                    <td>{{.CreatedAt.Format "02.01.2006"}}</td>
+                    <td class="actions">
+                        <a href="/admin/machines/{{.ID}}" class="btn-icon" title="Görüntüle">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/admin/machines/edit/{{.ID}}" class="btn-icon" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button onclick="toggleMachine({{.ID}})" class="btn-icon" 
+                                title="{{if .IsActive}}Pasif Yap{{else}}Aktif Yap{{end}}">
+                            <i class="fas {{if .IsActive}}fa-toggle-on{{else}}fa-toggle-off{{end}}"></i>
+                        </button>
+                        <button onclick="deleteMachine({{.ID}})" class="btn-icon" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="11" class="text-center">Henüz makine eklenmemiş</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sayfalama -->
+    <div class="pagination">
+        <button class="page-btn" onclick="changePage({{.Pagination.PrevPage}})" 
+                {{if not .Pagination.HasPrev}}disabled{{end}}>
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        {{range .Pagination.Pages}}
+        <button class="page-btn {{if eq . $.Pagination.CurrentPage}}active{{end}}" 
+                onclick="changePage({{.}})">
+            {{.}}
+        </button>
+        {{end}}
+        
+        <button class="page-btn" onclick="changePage({{.Pagination.NextPage}})" 
+                {{if not .Pagination.HasNext}}disabled{{end}}>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+    .machines-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        margin-bottom: 0.3rem;
+    }
+
+    .header-left p {
+        color: #6a7a8a;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        border: none;
+        border-radius: 8px;
+        color: #0a0f0f;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
+    }
+
+    .filters-bar {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .filter-group label {
+        font-size: 0.8rem;
+        color: #6a7a8a;
+    }
+
+    .filter-select {
+        padding: 0.5rem 2rem 0.5rem 0.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #e0e0e0;
+        cursor: pointer;
+    }
+
+    .search-box {
+        flex: 1;
+        position: relative;
+        min-width: 250px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6a7a8a;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #e0e0e0;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #00ff9d;
+    }
+
+    .btn-filter {
+        padding: 0.5rem 1rem;
+        background: transparent;
+        border: 1px solid #00ff9d;
+        border-radius: 5px;
+        color: #00ff9d;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-filter:hover {
+        background: rgba(0, 255, 157, 0.1);
+    }
+
+    .mini-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin: 0.5rem 0;
+    }
+
+    .mini-stat {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .mini-stat-value {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1.5rem;
+        color: #00ff9d;
+        display: block;
+    }
+
+    .mini-stat-label {
+        font-size: 0.7rem;
+        color: #6a7a8a;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 10px;
+    }
+
+    .machine-name {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .machine-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+    }
+
+    .difficulty-badge {
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .difficulty-easy { background: rgba(0, 255, 157, 0.2); color: #00ff9d; }
+    .difficulty-medium { background: rgba(255, 189, 46, 0.2); color: #ffbd2e; }
+    .difficulty-hard { background: rgba(255, 95, 86, 0.2); color: #ff5f56; }
+    .difficulty-expert { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+
+    .status-badge {
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: rgba(0, 255, 157, 0.2);
+        color: #00ff9d;
+        border: 1px solid #00ff9d;
+    }
+
+    .status-inactive {
+        background: rgba(255, 95, 86, 0.2);
+        color: #ff5f56;
+        border: 1px solid #ff5f56;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+
+    .btn-icon {
+        padding: 0.3rem 0.5rem;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 3px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-icon:hover {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .page-btn {
+        width: 35px;
+        height: 35px;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .page-btn.active {
+        background: #00ff9d;
+        border-color: #00ff9d;
+        color: #0a0f0f;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    .text-center {
+        text-align: center;
+        padding: 2rem;
+        color: #6a7a8a;
+    }
+</style>
+
+<script>
+    function toggleMachine(id) {
+        if (confirm('Makine durumunu değiştirmek istediğinize emin misiniz?')) {
+            fetch(`/admin/api/machines/${id}/toggle`, { method: 'POST' })
+                .then(() => window.location.reload());
+        }
+    }
+
+    function deleteMachine(id) {
+        if (confirm('Bu makineyi silmek istediğinize emin misiniz? Tüm sorular ve çözümler silinecektir!')) {
+            fetch(`/admin/api/machines/${id}`, { method: 'DELETE' })
+                .then(() => window.location.reload());
+        }
+    }
+
+    function applyFilters() {
+        const difficulty = document.getElementById('difficultyFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const vip = document.getElementById('vipFilter').value;
+        const search = document.getElementById('searchInput').value;
+        
+        window.location.href = `/admin/machines?difficulty=${difficulty}&status=${status}&vip=${vip}&search=${search}`;
+    }
+
+    function changePage(page) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+</script>
+{{end}}

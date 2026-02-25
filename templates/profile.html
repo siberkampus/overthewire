@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01000100 01100001 01110011 01101000 01100010 01101111 01100001 01110010 01100100 00100000 01000011 01010100 01000110 00100000 01010000 01101100 01100001 01110100 01100110 01101111 01110010 01101101";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .user-points {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            color: #00ff9d;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 10px;
+            width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1rem;
+            color: #e0e0e0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: #00ff9d;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #2a3a4a;
+            margin: 0.5rem 0;
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        .breadcrumb a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00ff9d;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+            color: #2a3a4a;
+        }
+
+        /* Hoş Geldin Mesajı */
+        .welcome-section {
+            background: linear-gradient(45deg, #00ff9d20, #00b8ff20);
+            border: 1px solid #00ff9d;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h1 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            color: #b0b0b0;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .welcome-stat {
+            text-align: center;
+        }
+
+        .welcome-stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: #00ff9d;
+        }
+
+        .welcome-stat-label {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        /* Ana İçerik Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Sol Panel */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .profile-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #00ff9d;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .profile-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-overlay i {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .profile-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: #00ff9d;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-username {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-vip {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #0a0f0f;
+        }
+
+        .badge-verified {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .badge-pro {
+            background: #00b8ff;
+            color: #0a0f0f;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid #2a3a4a;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            color: #00ff9d;
+        }
+
+        .profile-stat-label {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .edit-profile-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .edit-profile-btn:hover {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #2a3a4a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff9d, #00b8ff);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* Sağ Panel */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Dashboard Kartları */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #00ff9d;
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: #e0e0e0;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.7rem;
+        }
+
+        .stat-change.positive {
+            color: #00ff9d;
+        }
+
+        .stat-change.negative {
+            color: #ff5f56;
+        }
+
+        /* Grafikler */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .chart-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .chart-period {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            padding: 0.3rem 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.8rem;
+        }
+
+        .chart-container {
+            height: 250px;
+        }
+
+        /* Son Aktiviteler */
+        .activities-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .activities-list {
+            margin-top: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff9d;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        .activity-meta i {
+            color: #00ff9d;
+            margin-right: 0.3rem;
+        }
+
+        /* Devam Eden Makineler */
+        .machines-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .machine-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .machine-card:hover {
+            border-color: #00ff9d;
+            transform: translateX(5px);
+        }
+
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-name {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .machine-difficulty {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .difficulty-easy {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 95, 86, 0.2);
+            color: #ff5f56;
+        }
+
+        .machine-progress {
+            margin: 0.5rem 0;
+        }
+
+        .machine-progress-bar {
+            height: 4px;
+            background: #2a3a4a;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .machine-progress-fill {
+            height: 100%;
+            background: #00ff9d;
+        }
+
+        .machine-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        /* Hızlı İşlemler */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .action-btn:hover {
+            border-color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-text {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 15, 20, 0.95);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid #00ff9d;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section ul li a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #00ff9d;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff5f56;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00ff9d;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .machines-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu" id="userMenu">
+            <span class="user-points" id="userPoints">👑 1,250 Puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="toggleDropdown()">
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/dashboard" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="/profile/me" class="dropdown-item">
+                    <i class="fas fa-user"></i> Profilim
+                </a>
+                <a href="/settings" class="dropdown-item">
+                    <i class="fas fa-cog"></i> Ayarlar
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Ana Sayfa</a>
+            <i class="fas fa-chevron-right"></i>
+            <span style="color: #00ff9d;">Dashboard</span>
+        </div>
+
+        <!-- Hoş Geldin Mesajı -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1>Hoş Geldin, @cyber_ghost! 👋</h1>
+                <p>Bugün hacking yolculuğuna nereden başlamak istersin?</p>
+            </div>
+            <div class="welcome-stats">
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value">15</div>
+                    <div class="welcome-stat-label">Günlük Hedef</div>
+                </div>
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value">8/15</div>
+                    <div class="welcome-stat-label">Tamamlanan</div>
+                </div>
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value">🔥 7</div>
+                    <div class="welcome-stat-label">Günlük Seri</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ana İçerik Grid -->
+        <div class="content-grid">
+            <!-- Sol Panel -->
+            <div class="left-panel">
+                <!-- Profil Kartı -->
+                <div class="profile-card">
+                    <div class="profile-avatar" onclick="changeAvatar()">
+                        <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar">
+                        <div class="avatar-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="profile-name">Ahmet Yılmaz</div>
+                    <div class="profile-username">@cyber_ghost</div>
+                    <div class="profile-badges">
+                        <span class="badge badge-vip">VIP</span>
+                        <span class="badge badge-verified">✓ Doğrulanmış</span>
+                        <span class="badge badge-pro">PRO</span>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">1,542</div>
+                            <div class="profile-stat-label">Puan</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">156</div>
+                            <div class="profile-stat-label">Çözüm</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">#1</div>
+                            <div class="profile-stat-label">Sıra</div>
+                        </div>
+                    </div>
+                    <button class="edit-profile-btn" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Profili Düzenle
+                    </button>
+                </div>
+
+                <!-- İlerleme Kartı -->
+                <div class="progress-card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i> İLERLEME
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Toplam Çözüm</span>
+                            <span>156/200</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>VIP Makineler</span>
+                            <span>47/60</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Başarı Yüzdesi</span>
+                            <span>98%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 98%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hızlı İşlemler -->
+                <div class="quick-actions">
+                    <div class="action-btn" onclick="startRandomMachine()">
+                        <div class="action-icon">
+                            <i class="fas fa-dice"></i>
+                        </div>
+                        <div class="action-text">Rastgele Makine</div>
+                    </div>
+                    <div class="action-btn" onclick="continueLastMachine()">
+                        <div class="action-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="action-text">Kaldığın Yerden</div>
+                    </div>
+                    <div class="action-btn" onclick="viewAchievements()">
+                        <div class="action-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="action-text">Rozetler</div>
+                    </div>
+                    <div class="action-btn" onclick="inviteFriend()">
+                        <div class="action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="action-text">Arkadaş Davet Et</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel -->
+            <div class="right-panel">
+                <!-- İstatistik Kartları -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Toplam Çözüm</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12 bu hafta
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-value">1,542</div>
+                        <div class="stat-label">Toplam Puan</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +124
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="stat-value">#1</div>
+                        <div class="stat-label">Sıralama</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +2 sıra
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-value">7</div>
+                        <div class="stat-label">Günlük Seri</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> Rekor!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grafikler -->
+                <div class="charts-grid">
+                    <!-- Aktivite Grafiği -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">SON 7 GÜN</h3>
+                            <select class="chart-period" id="activityPeriod">
+                                <option value="week">Bu Hafta</option>
+                                <option value="month">Bu Ay</option>
+                                <option value="year">Bu Yıl</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Zorluk Dağılımı -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">ZORLUK DAĞILIMI</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="difficultyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devam Eden Makineler -->
+                <div class="activities-card">
+                    <div class="card-title">
+                        <i class="fas fa-spinner"></i> DEVAM EDEN MAKİNELER
+                    </div>
+                    <div class="machines-grid">
+                        <div class="machine-card" onclick="continueMachine(1)">
+                            <div class="machine-header">
+                                <span class="machine-name">HACKLAB-02</span>
+                                <span class="machine-difficulty difficulty-medium">Orta</span>
+                            </div>
+                            <div class="machine-progress">
+                                <div class="machine-progress-bar">
+                                    <div class="machine-progress-fill" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div class="machine-footer">
+                                <span><i class="fas fa-flag"></i> 3/5 soru</span>
+                                <span><i class="fas fa-clock"></i> 2 saat</span>
+                            </div>
+                        </div>
+
+                        <div class="machine-card" onclick="continueMachine(3)">
+                            <div class="machine-header">
+                                <span class="machine-name">HACKLAB-05</span>
+                                <span class="machine-difficulty difficulty-hard">Zor</span>
+                            </div>
+                            <div class="machine-progress">
+                                <div class="machine-progress-bar">
+                                    <div class="machine-progress-fill" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            <div class="machine-footer">
+                                <span><i class="fas fa-flag"></i> 1/4 soru</span>
+                                <span><i class="fas fa-clock"></i> 1 saat</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Son Aktiviteler -->
+                <div class="activities-card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> SON AKTİVİTELER
+                    </div>
+                    <div class="activities-list" id="activitiesList">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">HACKLAB-01 çözüldü</div>
+                                <div class="activity-meta">
+                                    <span><i class="fas fa-star"></i> 150 puan</span>
+                                    <span><i class="fas fa-clock"></i> 2 saat önce</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">"Speed Demon" rozeti kazanıldı</div>
+                                <div class="activity-meta">
+                                    <span><i class="fas fa-clock"></i> 5 saat önce</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">HACKLAB-02 hakkında yorum yapıldı</div>
+                                <div class="activity-meta">
+                                    <span><i class="fas fa-clock"></i> 1 gün önce</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">@new_hacker seni takip etmeye başladı</div>
+                                <div class="activity-meta">
+                                    <span><i class="fas fa-clock"></i> 2 gün önce</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Profil Düzenleme Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> PROFİL DÜZENLE</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="form-group">
+                        <label>Ad Soyad</label>
+                        <input type="text" class="form-control" id="fullName" value="Ahmet Yılmaz">
+                    </div>
+                    <div class="form-group">
+                        <label>Biyografi</label>
+                        <textarea class="form-control" id="bio" rows="3">Merhaba! 5+ yıllık güvenlik araştırmacısıyım. Web güvenliği, reverse engineering ve binary exploitation alanlarında uzmanım.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Konum</label>
+                        <input type="text" class="form-control" id="location" value="İstanbul, Türkiye">
+                    </div>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="text" class="form-control" id="website" value="cyberghost.com">
+                    </div>
+                    <button type="submit" class="btn-save" onclick="saveProfile(event)">
+                        <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Grafikler
+        let activityChart, difficultyChart;
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            initCharts();
+            loadUserData();
+        });
+
+        // Grafikleri başlat
+        function initCharts() {
+            // Aktivite Grafiği
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            activityChart = new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'],
+                    datasets: [{
+                        label: 'Çözülen Makineler',
+                        data: [5, 8, 12, 7, 15, 20, 18],
+                        borderColor: '#00ff9d',
+                        backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#2a3a4a'
+                            },
+                            ticks: {
+                                color: '#b0b0b0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#b0b0b0'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Zorluk Dağılımı Grafiği
+            const difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+            difficultyChart = new Chart(difficultyCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Kolay', 'Orta', 'Zor', 'Uzman'],
+                    datasets: [{
+                        data: [78, 52, 26, 0],
+                        backgroundColor: [
+                            '#00ff9d',
+                            '#ffbd2e',
+                            '#ff5f56',
+                            '#ff00c8'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#b0b0b0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Kullanıcı verilerini yükle
+        function loadUserData() {
+            // Mock veriler
+            document.getElementById('userPoints').innerHTML = '👑 1,542 Puan';
+        }
+
+        // Dropdown menü
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        }
+
+        // Dışarı tıklanınca dropdown'u kapat
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-avatar')) {
+                const dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        // Profil düzenleme
+        function editProfile() {
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProfileModal').classList.remove('show');
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const bio = document.getElementById('bio').value;
+            const location = document.getElementById('location').value;
+            const website = document.getElementById('website').value;
+            
+            // API çağrısı yapılacak
+            console.log('Profil güncelleniyor:', { fullName, bio, location, website });
+            
+            alert('Profil başarıyla güncellendi!');
+            closeEditModal();
+        }
+
+        // Avatar değiştirme
+        function changeAvatar() {
+            alert('Avatar değiştirme özelliği yakında!');
+        }
+
+        // Çıkış yap
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+                localStorage.removeItem('access_token');
+                sessionStorage.removeItem('access_token');
+                window.location.href = '/';
+            }
+        }
+
+        // Hızlı işlemler
+        function startRandomMachine() {
+            window.location.href = '/machines/random';
+        }
+
+        function continueLastMachine() {
+            window.location.href = '/machines/1/terminal';
+        }
+
+        function viewAchievements() {
+            alert('Rozetler sayfası yakında!');
+        }
+
+        function inviteFriend() {
+            prompt('Arkadaşını davet etmek için link:', 'https://hacklab.com/ref/cyber_ghost');
+        }
+
+        // Makine devam et
+        function continueMachine(machineId) {
+            window.location.href = `/machines/${machineId}/terminal`;
+        }
+
+        // Periyot değiştir
+        document.getElementById('activityPeriod').addEventListener('change', function(e) {
+            // API'den yeni veri çek
+            console.log('Periyot değişti:', e.target.value);
+            
+            // Mock veri güncelleme
+            const newData = {
+                week: [5, 8, 12, 7, 15, 20, 18],
+                month: [45, 52, 38, 41, 55, 48, 62, 58, 63, 71, 68, 74, 82, 78, 85, 91, 88, 94, 102, 98, 105, 112, 108, 115, 121, 118, 124, 131, 128, 135],
+                year: [450, 520, 580, 610, 680, 720, 780, 820, 880, 940, 1020, 1100]
+            };
+            
+            activityChart.data.datasets[0].data = newData[e.target.value];
+            activityChart.update();
+        });
+
+        // Sayfa kapatılırken
+        window.addEventListener('beforeunload', function() {
+            if (activityChart) activityChart.destroy();
+            if (difficultyChart) difficultyChart.destroy();
+        });
+    </script>
+</body>
+</html>

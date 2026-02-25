@@ -1,0 +1,1052 @@
+{{define "content"}}
+<div class="logs-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <h2><i class="fas fa-history"></i> Sistem Logları</h2>
+            <p>Tüm sistem aktivitelerini görüntüleyin ve analiz edin</p>
+        </div>
+        <div class="header-right">
+            <button class="btn-primary" onclick="exportLogs()">
+                <i class="fas fa-download"></i> Dışa Aktar
+            </button>
+            <button class="btn-secondary" onclick="clearLogs()">
+                <i class="fas fa-trash"></i> Temizle
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label>Log Tipi:</label>
+            <select id="logType" class="filter-select" onchange="applyFilters()">
+                <option value="all">Tümü</option>
+                <option value="user">Kullanıcı İşlemleri</option>
+                <option value="machine">Makine İşlemleri</option>
+                <option value="submission">Çözüm İşlemleri</option>
+                <option value="vip">VIP İşlemleri</option>
+                <option value="admin">Admin İşlemleri</option>
+                <option value="system">Sistem</option>
+                <option value="error">Hata</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Kullanıcı:</label>
+            <input type="text" id="username" class="filter-input" placeholder="Kullanıcı adı" onchange="applyFilters()">
+        </div>
+
+        <div class="filter-group">
+            <label>IP Adresi:</label>
+            <input type="text" id="ipAddress" class="filter-input" placeholder="192.168.1.1" onchange="applyFilters()">
+        </div>
+
+        <div class="filter-group">
+            <label>Tarih Aralığı:</label>
+            <div class="date-range">
+                <input type="date" id="startDate" class="filter-input" onchange="applyFilters()">
+                <span>-</span>
+                <input type="date" id="endDate" class="filter-input" onchange="applyFilters()">
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Durum:</label>
+            <select id="status" class="filter-select" onchange="applyFilters()">
+                <option value="all">Tümü</option>
+                <option value="success">Başarılı</option>
+                <option value="error">Hata</option>
+                <option value="warning">Uyarı</option>
+                <option value="info">Bilgi</option>
+            </select>
+        </div>
+
+        <button class="btn-filter" onclick="resetFilters()">
+            <i class="fas fa-undo"></i> Sıfırla
+        </button>
+    </div>
+
+    <!-- Log İstatistikleri -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-list"></i></div>
+            <div class="stat-content">
+                <div class="stat-value" id="totalLogs">0</div>
+                <div class="stat-label">Toplam Log</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="border-color: #00ff9d;"><i class="fas fa-check-circle" style="color: #00ff9d;"></i></div>
+            <div class="stat-content">
+                <div class="stat-value" id="successLogs">0</div>
+                <div class="stat-label">Başarılı</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="border-color: #ffbd2e;"><i class="fas fa-exclamation-triangle" style="color: #ffbd2e;"></i></div>
+            <div class="stat-content">
+                <div class="stat-value" id="warningLogs">0</div>
+                <div class="stat-label">Uyarı</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="border-color: #ff5f56;"><i class="fas fa-times-circle" style="color: #ff5f56;"></i></div>
+            <div class="stat-content">
+                <div class="stat-value" id="errorLogs">0</div>
+                <div class="stat-label">Hata</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Grafiği -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-bar"></i> Log Aktivitesi (Son 7 Gün)
+            </h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="logsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Log Tablosu -->
+    <div class="table-container">
+        <table class="data-table" id="logsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tarih</th>
+                    <th>Tip</th>
+                    <th>Kullanıcı</th>
+                    <th>IP Adresi</th>
+                    <th>İşlem</th>
+                    <th>Detay</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                <tr>
+                    <td colspan="9" class="text-center">Yükleniyor...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sayfalama -->
+    <div class="pagination" id="pagination"></div>
+
+    <!-- Log Detay Modalı -->
+    <div id="logDetailModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Log Detayı #<span id="detailLogId"></span></h3>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Tarih</div>
+                        <div class="detail-value" id="detailTimestamp">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tip</div>
+                        <div class="detail-value" id="detailType">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Kullanıcı</div>
+                        <div class="detail-value" id="detailUsername">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">IP Adresi</div>
+                        <div class="detail-value" id="detailIP">-</div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">İşlem</div>
+                        <div class="detail-value" id="detailAction">-</div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Detay</div>
+                        <pre class="detail-pre" id="detailDetails">-</pre>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">User Agent</div>
+                        <div class="detail-value" id="detailUserAgent">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Session ID</div>
+                        <div class="detail-value" id="detailSessionId">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Request Method</div>
+                        <div class="detail-value" id="detailMethod">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Request URL</div>
+                        <div class="detail-value" id="detailURL">-</div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Request Headers</div>
+                        <pre class="detail-pre" id="detailHeaders">-</pre>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Response</div>
+                        <pre class="detail-pre" id="detailResponse">-</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDetailModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .logs-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        margin-bottom: 0.3rem;
+    }
+
+    .header-left p {
+        color: #6a7a8a;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        border: none;
+        border-radius: 8px;
+        color: #0a0f0f;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
+    }
+
+    .btn-secondary {
+        padding: 0.8rem 1.5rem;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 8px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-secondary:hover {
+        border-color: #ff5f56;
+        color: #ff5f56;
+    }
+
+    .filters-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        min-width: 150px;
+    }
+
+    .filter-group label {
+        font-size: 0.8rem;
+        color: #6a7a8a;
+    }
+
+    .filter-select,
+    .filter-input {
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #e0e0e0;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #00ff9d;
+    }
+
+    .date-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .date-range input {
+        width: 130px;
+    }
+
+    .btn-filter {
+        padding: 0.5rem 1.5rem;
+        background: transparent;
+        border: 1px solid #00ff9d;
+        border-radius: 5px;
+        color: #00ff9d;
+        cursor: pointer;
+        transition: 0.3s;
+        height: 37px;
+        margin-top: auto;
+    }
+
+    .btn-filter:hover {
+        background: rgba(0, 255, 157, 0.1);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid #00ff9d;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #00ff9d;
+    }
+
+    .stat-value {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1.5rem;
+        color: #00ff9d;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #6a7a8a;
+    }
+
+    .chart-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .chart-header {
+        margin-bottom: 1rem;
+    }
+
+    .chart-title {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-size: 1.1rem;
+    }
+
+    .chart-title i {
+        margin-right: 0.5rem;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: rgba(0, 255, 157, 0.1);
+        padding: 1rem;
+        text-align: left;
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .data-table tr:hover {
+        background: rgba(0, 255, 157, 0.05);
+    }
+
+    .log-type {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .type-user { background: rgba(0, 255, 157, 0.2); color: #00ff9d; }
+    .type-machine { background: rgba(0, 184, 255, 0.2); color: #00b8ff; }
+    .type-submission { background: rgba(255, 189, 46, 0.2); color: #ffbd2e; }
+    .type-vip { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+    .type-admin { background: rgba(255, 95, 86, 0.2); color: #ff5f56; }
+    .type-system { background: rgba(106, 122, 138, 0.2); color: #6a7a8a; }
+    .type-error { background: rgba(255, 0, 0, 0.2); color: #ff0000; }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+    }
+
+    .status-success {
+        background: rgba(0, 255, 157, 0.2);
+        color: #00ff9d;
+        border: 1px solid #00ff9d;
+    }
+
+    .status-warning {
+        background: rgba(255, 189, 46, 0.2);
+        color: #ffbd2e;
+        border: 1px solid #ffbd2e;
+    }
+
+    .status-error {
+        background: rgba(255, 95, 86, 0.2);
+        color: #ff5f56;
+        border: 1px solid #ff5f56;
+    }
+
+    .status-info {
+        background: rgba(0, 184, 255, 0.2);
+        color: #00b8ff;
+        border: 1px solid #00b8ff;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+
+    .btn-icon {
+        padding: 0.3rem 0.5rem;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 3px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-icon:hover {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .btn-icon.delete:hover {
+        border-color: #ff5f56;
+        color: #ff5f56;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .page-btn {
+        width: 35px;
+        height: 35px;
+        background: transparent;
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        color: #b0b0b0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        border-color: #00ff9d;
+        color: #00ff9d;
+    }
+
+    .page-btn.active {
+        background: #00ff9d;
+        border-color: #00ff9d;
+        color: #0a0f0f;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        overflow: auto;
+    }
+
+    .modal-content {
+        background: #1a1f2f;
+        margin: 5% auto;
+        border: 1px solid #00ff9d;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 900px;
+        animation: modalSlideIn 0.3s;
+    }
+
+    .modal-content.modal-lg {
+        max-width: 1100px;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #2a3a4a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        color: #00ff9d;
+        font-family: 'Share Tech Mono', monospace;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #6a7a8a;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .modal-close:hover {
+        color: #ff5f56;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #2a3a4a;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .detail-label {
+        font-size: 0.8rem;
+        color: #6a7a8a;
+        margin-bottom: 0.3rem;
+    }
+
+    .detail-value {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        word-break: break-word;
+    }
+
+    .detail-pre {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 5px;
+        padding: 1rem;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.8rem;
+        color: #e0e0e0;
+        overflow-x: auto;
+        white-space: pre-wrap;
+    }
+
+    .text-center {
+        text-align: center;
+        color: #6a7a8a;
+        padding: 2rem;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let logsChart;
+
+    // Sayfa yüklendiğinde
+    document.addEventListener('DOMContentLoaded', function() {
+        loadLogs();
+        loadLogsChart();
+    });
+
+    // Logları yükle
+    async function loadLogs() {
+        const type = document.getElementById('logType').value;
+        const username = document.getElementById('username').value;
+        const ip = document.getElementById('ipAddress').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const status = document.getElementById('status').value;
+
+        try {
+            const response = await fetch(`/admin/api/logs?page=${currentPage}&type=${type}&username=${username}&ip=${ip}&start=${startDate}&end=${endDate}&status=${status}`);
+            const data = await response.json();
+            
+            renderLogs(data.logs);
+            updateStats(data.stats);
+            renderPagination(data.pagination);
+        } catch (error) {
+            console.error('Loglar yüklenemedi:', error);
+        }
+    }
+
+    // Logları tabloda göster
+    function renderLogs(logs) {
+        const tbody = document.getElementById('logsTableBody');
+        
+        if (!logs || logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center">Log bulunamadı</td></tr>';
+            return;
+        }
+
+        let html = '';
+        logs.forEach(log => {
+            const typeClass = getTypeClass(log.type);
+            const statusClass = getStatusClass(log.status);
+            
+            html += `
+                <tr>
+                    <td>#${log.id}</td>
+                    <td>${formatDate(log.timestamp)}</td>
+                    <td><span class="log-type ${typeClass}">${log.type}</span></td>
+                    <td>${log.username || '-'}</td>
+                    <td>${log.ip_address || '-'}</td>
+                    <td>${log.action}</td>
+                    <td>${truncateText(log.details, 50)}</td>
+                    <td><span class="status-badge ${statusClass}">${log.status}</span></td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="viewLog(${log.id})" title="Detay">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="copyLog(${log.id})" title="Kopyala">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon delete" onclick="deleteLog(${log.id})" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    function getTypeClass(type) {
+        const classes = {
+            'user': 'type-user',
+            'machine': 'type-machine',
+            'submission': 'type-submission',
+            'vip': 'type-vip',
+            'admin': 'type-admin',
+            'system': 'type-system',
+            'error': 'type-error'
+        };
+        return classes[type] || 'type-system';
+    }
+
+    function getStatusClass(status) {
+        const classes = {
+            'success': 'status-success',
+            'warning': 'status-warning',
+            'error': 'status-error',
+            'info': 'status-info'
+        };
+        return classes[status] || 'status-info';
+    }
+
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+
+    function truncateText(text, length) {
+        if (!text) return '-';
+        return text.length > length ? text.substring(0, length) + '...' : text;
+    }
+
+    // İstatistikleri güncelle
+    function updateStats(stats) {
+        document.getElementById('totalLogs').textContent = stats.total || 0;
+        document.getElementById('successLogs').textContent = stats.success || 0;
+        document.getElementById('warningLogs').textContent = stats.warning || 0;
+        document.getElementById('errorLogs').textContent = stats.error || 0;
+    }
+
+    // Log grafiğini yükle
+    async function loadLogsChart() {
+        try {
+            const response = await fetch('/admin/api/logs/chart?days=7');
+            const data = await response.json();
+            
+            if (logsChart) logsChart.destroy();
+            
+            logsChart = new Chart(document.getElementById('logsChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Başarılı',
+                        data: data.success,
+                        borderColor: '#00ff9d',
+                        backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Hata',
+                        data: data.error,
+                        borderColor: '#ff5f56',
+                        backgroundColor: 'rgba(255, 95, 86, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Uyarı',
+                        data: data.warning,
+                        borderColor: '#ffbd2e',
+                        backgroundColor: 'rgba(255, 189, 46, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#b0b0b0' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#2a3a4a' },
+                            ticks: { color: '#b0b0b0' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#b0b0b0' }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Log grafiği yüklenemedi:', error);
+        }
+    }
+
+    // Sayfalama
+    function renderPagination(pagination) {
+        if (!pagination) return;
+        
+        currentPage = pagination.current_page;
+        totalPages = pagination.total_pages;
+        
+        let html = '';
+        
+        // Önceki buton
+        html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+            <i class="fas fa-chevron-left"></i>
+        </button>`;
+        
+        // Sayfa numaraları
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" 
+                    onclick="changePage(${i})">${i}</button>`;
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                html += `<button class="page-btn" disabled>...</button>`;
+            }
+        }
+        
+        // Sonraki buton
+        html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+            <i class="fas fa-chevron-right"></i>
+        </button>`;
+        
+        document.getElementById('pagination').innerHTML = html;
+    }
+
+    function changePage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        loadLogs();
+    }
+
+    // Filtreleme
+    function applyFilters() {
+        currentPage = 1;
+        loadLogs();
+    }
+
+    function resetFilters() {
+        document.getElementById('logType').value = 'all';
+        document.getElementById('username').value = '';
+        document.getElementById('ipAddress').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('status').value = 'all';
+        applyFilters();
+    }
+
+    // Log detayı görüntüle
+    async function viewLog(id) {
+        try {
+            const response = await fetch(`/admin/api/logs/${id}`);
+            const log = await response.json();
+            
+            document.getElementById('detailLogId').textContent = log.id;
+            document.getElementById('detailTimestamp').textContent = formatDate(log.timestamp);
+            document.getElementById('detailType').innerHTML = `<span class="log-type ${getTypeClass(log.type)}">${log.type}</span>`;
+            document.getElementById('detailUsername').textContent = log.username || '-';
+            document.getElementById('detailIP').textContent = log.ip_address || '-';
+            document.getElementById('detailAction').textContent = log.action || '-';
+            document.getElementById('detailDetails').textContent = log.details || '-';
+            document.getElementById('detailUserAgent').textContent = log.user_agent || '-';
+            document.getElementById('detailSessionId').textContent = log.session_id || '-';
+            document.getElementById('detailMethod').textContent = log.method || '-';
+            document.getElementById('detailURL').textContent = log.url || '-';
+            document.getElementById('detailHeaders').textContent = log.headers ? JSON.stringify(log.headers, null, 2) : '-';
+            document.getElementById('detailResponse').textContent = log.response ? JSON.stringify(log.response, null, 2) : '-';
+            
+            document.getElementById('logDetailModal').style.display = 'block';
+        } catch (error) {
+            console.error('Log detayı yüklenemedi:', error);
+        }
+    }
+
+    function closeDetailModal() {
+        document.getElementById('logDetailModal').style.display = 'none';
+    }
+
+    // Log kopyala
+    async function copyLog(id) {
+        try {
+            const response = await fetch(`/admin/api/logs/${id}`);
+            const log = await response.json();
+            
+            navigator.clipboard.writeText(JSON.stringify(log, null, 2)).then(() => {
+                showNotification('Log kopyalandı!', 'success');
+            });
+        } catch (error) {
+            showNotification('Kopyalama başarısız!', 'error');
+        }
+    }
+
+    // Log sil
+    async function deleteLog(id) {
+        if (confirm('Bu log kaydını silmek istediğinize emin misiniz?')) {
+            try {
+                const response = await fetch(`/admin/api/logs/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showNotification('Log silindi!', 'success');
+                    loadLogs();
+                }
+            } catch (error) {
+                showNotification('Silme başarısız!', 'error');
+            }
+        }
+    }
+
+    // Logları dışa aktar
+    async function exportLogs() {
+        const type = document.getElementById('logType').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        try {
+            const response = await fetch(`/admin/api/logs/export?type=${type}&start=${startDate}&end=${endDate}`);
+            const blob = await response.blob();
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            showNotification('Dışa aktarma başarısız!', 'error');
+        }
+    }
+
+    // Logları temizle
+    async function clearLogs() {
+        if (confirm('Tüm logları silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+            try {
+                const response = await fetch('/admin/api/logs/clear', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showNotification('Loglar temizlendi!', 'success');
+                    loadLogs();
+                    loadLogsChart();
+                }
+            } catch (error) {
+                showNotification('Temizleme başarısız!', 'error');
+            }
+        }
+    }
+
+    // Bildirim göster
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Modal dışına tıklanınca kapat
+    window.onclick = function(event) {
+        const modal = document.getElementById('logDetailModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+<style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideIn 0.3s;
+    }
+
+    .notification.success {
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        color: #0a0f0f;
+    }
+
+    .notification.error {
+        background: linear-gradient(45deg, #ff5f56, #ff3333);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+{{end}}

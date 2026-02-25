@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makineler - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01001101 01100001 01100011 01101000 01101001 01101110 01100101 01110011 00100000 01000011 01010100 01000110 00100000 01010000 01101100 01100001 01110100 01100110 01101111 01110010 01101101";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            color: #00ff9d;
+        }
+
+        .page-title::before {
+            content: '[';
+            margin-right: 10px;
+            color: #00ff9d;
+        }
+
+        .page-title::after {
+            content: ']';
+            margin-left: 10px;
+            color: #00ff9d;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 2rem;
+            background: rgba(20, 30, 40, 0.8);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            border: 1px solid #2a3a4a;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: #00ff9d;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        /* Filtreler */
+        .filters-section {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            position: relative;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #00ff9d;
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+        }
+
+        .filter-select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 1rem;
+            bottom: 0.8rem;
+            color: #6a7a8a;
+            pointer-events: none;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6a7a8a;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .btn-filter {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-reset {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-reset:hover {
+            border-color: #ff5f56;
+            color: #ff5f56;
+        }
+
+        /* Aktif filtreler */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .filter-tag {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            color: #00ff9d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-tag i {
+            cursor: pointer;
+        }
+
+        .filter-tag i:hover {
+            color: #ff5f56;
+        }
+
+        /* Makine Grid */
+        .machines-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .results-count span {
+            color: #00ff9d;
+            font-weight: 600;
+        }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sort-label {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .sort-select {
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .view-btn.active {
+            background: #00ff9d;
+            color: #0a0f0f;
+            border-color: #00ff9d;
+        }
+
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .machine-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .machine-card {
+            background: rgba(20, 30, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff9d;
+            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.2);
+        }
+
+        .machine-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 157, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+            pointer-events: none;
+        }
+
+        .machine-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1;
+        }
+
+        .badge-vip {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #0a0f0f;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: #00ff9d;
+            color: #0a0f0f;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .machine-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .machine-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #00ff9d;
+        }
+
+        .machine-title {
+            flex: 1;
+        }
+
+        .machine-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.3rem;
+            color: #00ff9d;
+            margin-bottom: 0.3rem;
+        }
+
+        .machine-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        .machine-meta i {
+            color: #00ff9d;
+            margin-right: 0.3rem;
+        }
+
+        .machine-difficulty {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-easy {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+            border: 1px solid #ffbd2e;
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 95, 86, 0.2);
+            color: #ff5f56;
+            border: 1px solid #ff5f56;
+        }
+
+        .difficulty-expert {
+            background: rgba(255, 0, 200, 0.2);
+            color: #ff00c8;
+            border: 1px solid #ff00c8;
+        }
+
+        .machine-description {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .machine-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-bottom: 0.3rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #2a3a4a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff9d, #00b8ff);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .machine-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 1rem 0;
+            border-top: 1px solid #2a3a4a;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .machine-stat {
+            text-align: center;
+        }
+
+        .stat-icon {
+            color: #00ff9d;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .machine-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 3px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            color: #b0b0b0;
+        }
+
+        .machine-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .machine-points {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.2rem;
+        }
+
+        .machine-points small {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .btn-start {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #00ff9d;
+            color: #0a0f0f;
+            transform: translateX(5px);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #6a7a8a;
+            color: #6a7a8a;
+        }
+
+        .btn-start i {
+            font-size: 0.9rem;
+        }
+
+        /* List view için özel stiller */
+        .machine-grid.list-view .machine-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .machine-grid.list-view .machine-header {
+            margin-bottom: 0;
+            width: 250px;
+        }
+
+        .machine-grid.list-view .machine-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .machine-grid.list-view .machine-stats {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 0;
+            border: none;
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+
+        .machine-grid.list-view .machine-footer {
+            width: auto;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 3rem 0;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .page-link:hover,
+        .page-link.active {
+            background: #00ff9d;
+            border-color: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .page-dots {
+            color: #6a7a8a;
+            padding: 0 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 15, 20, 0.95);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid #00ff9d;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section ul li a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #00ff9d;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff5f56;
+        }
+
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+
+        .modal-body p {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            color: #0a0f0f;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-modal-secondary {
+            background: transparent;
+            border: 1px solid #2a3a4a;
+            color: #b0b0b0;
+        }
+
+        .btn-modal-secondary:hover {
+            border-color: #ff5f56;
+            color: #ff5f56;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .machine-grid.list-view .machine-card {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .machine-grid.list-view .machine-info {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .machines-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .sort-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .machine-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .machine-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .btn-start {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines" class="active">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span id="userPoints" style="color: #00ff9d;">👑 1250 puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="window.location.href='/profile'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">MAKİNELER</h1>
+            <div class="user-stats">
+                <div class="stat">
+                    <div class="stat-value" id="solvedCount">24</div>
+                    <div class="stat-label">Çözülen</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalMachines">50</div>
+                    <div class="stat-label">Toplam</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="userRank">#42</div>
+                    <div class="stat-label">Sıralama</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtreler -->
+        <div class="filters-section">
+            <div class="filters-title">
+                <i class="fas fa-filter"></i> FİLTRELE
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Zorluk</label>
+                    <select class="filter-select" id="difficultyFilter">
+                        <option value="all">Tümü</option>
+                        <option value="easy">Kolay</option>
+                        <option value="medium">Orta</option>
+                        <option value="hard">Zor</option>
+                        <option value="expert">Uzman</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Durum</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">Tümü</option>
+                        <option value="unsolved">Çözülmemiş</option>
+                        <option value="in-progress">Devam Ediyor</option>
+                        <option value="solved">Çözülmüş</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Erişim</label>
+                    <select class="filter-select" id="accessFilter">
+                        <option value="all">Tümü</option>
+                        <option value="free">Herkese Açık</option>
+                        <option value="vip">Sadece VIP</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                
+                <div class="filter-group search-box">
+                    <label class="filter-label">Ara</label>
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="filter-input" id="searchFilter" placeholder="Makine adı...">
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn-filter" onclick="applyFilters()">
+                    <i class="fas fa-check"></i> Uygula
+                </button>
+                <button class="btn-reset" onclick="resetFilters()">
+                    <i class="fas fa-undo"></i> Sıfırla
+                </button>
+            </div>
+
+            <!-- Aktif filtreler -->
+            <div class="active-filters" id="activeFilters"></div>
+        </div>
+
+        <!-- Makineler Header -->
+        <div class="machines-header">
+            <div class="results-count">
+                <span id="displayCount">12</span> / <span id="totalCount">50</span> makine gösteriliyor
+            </div>
+            <div class="sort-options">
+                <span class="sort-label">Sırala:</span>
+                <select class="sort-select" id="sortFilter" onchange="applyFilters()">
+                    <option value="newest">En Yeni</option>
+                    <option value="oldest">En Eski</option>
+                    <option value="most-solved">En Çok Çözülen</option>
+                    <option value="least-solved">En Az Çözülen</option>
+                    <option value="highest-points">En Yüksek Puan</option>
+                    <option value="lowest-points">En Düşük Puan</option>
+                </select>
+                <div class="view-options">
+                    <button class="view-btn active" onclick="changeView('grid')" id="gridViewBtn">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" onclick="changeView('list')" id="listViewBtn">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Makine Grid -->
+        <div class="machine-grid" id="machineGrid">
+            <!-- Makineler JavaScript ile doldurulacak -->
+        </div>
+
+        <!-- Pagination -->
+        <ul class="pagination" id="pagination"></ul>
+    </div>
+
+    <!-- Start Machine Modal -->
+    <div class="modal" id="startModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-terminal"></i> Makine Başlat</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMachineName"></p>
+                <p>Makine başlatılıyor... Bu işlem birkaç saniye sürebilir.</p>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #00ff9d;"></i>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-secondary" onclick="closeModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mock veri
+        const machines = [
+            {
+                id: 1,
+                name: "HACKLAB-01",
+                description: "Web güvenliği ve SQL injection pratiği için temel seviye makine.",
+                difficulty: "easy",
+                points: 150,
+                solved: 1245,
+                totalQuestions: 3,
+                solvedQuestions: 0,
+                isVIP: false,
+                isNew: true,
+                tags: ["web", "sql", "easy"],
+                creator: "@cyber_ghost",
+                created: "2024-01-15",
+                icon: "🌐"
+            },
+            {
+                id: 2,
+                name: "HACKLAB-02",
+                description: "Binary exploitation ve reverse engineering becerilerini geliştirmek için orta seviye makine.",
+                difficulty: "medium",
+                points: 300,
+                solved: 856,
+                totalQuestions: 5,
+                solvedQuestions: 2,
+                isVIP: true,
+                isNew: false,
+                tags: ["binary", "reverse", "exploit"],
+                creator: "@root_hunter",
+                created: "2024-01-10",
+                icon: "⚙️"
+            },
+            {
+                id: 3,
+                name: "HACKLAB-03",
+                description: "Ağ güvenliği ve penetration testing senaryoları içeren zor seviye makine.",
+                difficulty: "hard",
+                points: 500,
+                solved: 324,
+                totalQuestions: 7,
+                solvedQuestions: 0,
+                isVIP: false,
+                isNew: true,
+                tags: ["network", "pentest", "scanning"],
+                creator: "@byte_bender",
+                created: "2024-01-05",
+                icon: "🌐"
+            },
+            {
+                id: 4,
+                name: "HACKLAB-04",
+                description: "Kriptografi ve şifreleme algoritmaları üzerine uzman seviye makine.",
+                difficulty: "expert",
+                points: 750,
+                solved: 98,
+                totalQuestions: 10,
+                solvedQuestions: 0,
+                isVIP: true,
+                isNew: false,
+                tags: ["crypto", "encryption", "math"],
+                creator: "@payload_master",
+                created: "2023-12-20",
+                icon: "🔐"
+            },
+            {
+                id: 5,
+                name: "HACKLAB-05",
+                description: "Privilege escalation ve sistem güvenliği açıklarını keşfetme.",
+                difficulty: "hard",
+                points: 450,
+                solved: 567,
+                totalQuestions: 6,
+                solvedQuestions: 1,
+                isVIP: false,
+                isNew: false,
+                tags: ["privesc", "system", "linux"],
+                creator: "@shell_shocker",
+                created: "2023-12-15",
+                icon: "🐧"
+            },
+            {
+                id: 6,
+                name: "HACKLAB-06",
+                description: "OSINT ve bilgi toplama teknikleri üzerine başlangıç seviye makine.",
+                difficulty: "easy",
+                points: 100,
+                solved: 2100,
+                totalQuestions: 4,
+                solvedQuestions: 4,
+                isVIP: false,
+                isNew: true,
+                tags: ["osint", "recon", "info"],
+                creator: "@cyber_ghost",
+                created: "2024-01-18",
+                icon: "🔍"
+            }
+        ];
+
+        let currentView = 'grid';
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let filteredMachines = [...machines];
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            renderMachines();
+            updateActiveFilters();
+            checkUserStatus();
+        });
+
+        // Makineleri render et
+        function renderMachines() {
+            const grid = document.getElementById('machineGrid');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedMachines = filteredMachines.slice(start, end);
+            
+            grid.innerHTML = paginatedMachines.map(machine => createMachineCard(machine)).join('');
+            
+            document.getElementById('displayCount').textContent = paginatedMachines.length;
+            document.getElementById('totalCount').textContent = filteredMachines.length;
+            
+            renderPagination();
+        }
+
+        // Makine kartı oluştur
+        function createMachineCard(machine) {
+            const solvedPercentage = (machine.solvedQuestions / machine.totalQuestions) * 100;
+            const isLoggedIn = checkAuth();
+            
+            return `
+                <div class="machine-card">
+                    <div class="machine-badge">
+                        ${machine.isNew ? '<span class="badge-new">YENİ</span>' : ''}
+                        ${machine.isVIP ? '<span class="badge-vip">VIP</span>' : ''}
+                    </div>
+                    <div class="machine-header">
+                        <div class="machine-icon">${machine.icon}</div>
+                        <div class="machine-title">
+                            <div class="machine-name">${machine.name}</div>
+                            <div class="machine-meta">
+                                <span><i class="fas fa-user"></i> ${machine.creator}</span>
+                                <span><i class="fas fa-calendar"></i> ${machine.created}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="machine-difficulty difficulty-${machine.difficulty}">
+                        <i class="fas fa-${getDifficultyIcon(machine.difficulty)}"></i>
+                        ${getDifficultyText(machine.difficulty)}
+                    </div>
+                    
+                    <div class="machine-description">
+                        ${machine.description}
+                    </div>
+                    
+                    <div class="machine-progress">
+                        <div class="progress-header">
+                            <span>İlerleme</span>
+                            <span>${machine.solvedQuestions}/${machine.totalQuestions}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${solvedPercentage}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="machine-stats">
+                        <div class="machine-stat">
+                            <div class="stat-icon"><i class="fas fa-flag"></i></div>
+                            <div class="stat-value">${machine.solvedQuestions}</div>
+                            <div class="stat-label">Çözülen</div>
+                        </div>
+                        <div class="machine-stat">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${machine.solved}</div>
+                            <div class="stat-label">Toplam Çözüm</div>
+                        </div>
+                        <div class="machine-stat">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value">${machine.points}</div>
+                            <div class="stat-label">Puan</div>
+                        </div>
+                    </div>
+                    
+                    <div class="machine-tags">
+                        ${machine.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                    </div>
+                    
+                    <div class="machine-footer">
+                        <div class="machine-points">
+                            ${machine.points} <small>puan</small>
+                        </div>
+                        <button class="btn-start" 
+                                onclick="startMachine(${machine.id})"
+                                ${!isLoggedIn || (machine.isVIP && !isUserVIP()) ? 'disabled' : ''}>
+                            <i class="fas fa-play"></i>
+                            ${machine.isVIP ? 'VIP BAŞLAT' : 'BAŞLAT'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Pagination render
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredMachines.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            let html = '';
+            
+            // Previous button
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `
+                        <li class="page-item">
+                            <a class="page-link ${i === currentPage ? 'active' : ''}" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<li class="page-dots">...</li>`;
+                }
+            }
+            
+            // Next button
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        // Sayfa değiştir
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredMachines.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            renderMachines();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filtreleri uygula
+        function applyFilters() {
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const access = document.getElementById('accessFilter').value;
+            const search = document.getElementById('searchFilter').value.toLowerCase();
+            const sort = document.getElementById('sortFilter').value;
+            
+            filteredMachines = machines.filter(machine => {
+                if (difficulty !== 'all' && machine.difficulty !== difficulty) return false;
+                if (access === 'vip' && !machine.isVIP) return false;
+                if (access === 'free' && machine.isVIP) return false;
+                
+                if (status !== 'all') {
+                    const solved = machine.solvedQuestions > 0;
+                    const completed = machine.solvedQuestions === machine.totalQuestions;
+                    
+                    if (status === 'solved' && !completed) return false;
+                    if (status === 'in-progress' && (completed || !solved)) return false;
+                    if (status === 'unsolved' && solved) return false;
+                }
+                
+                if (search && !machine.name.toLowerCase().includes(search) && 
+                    !machine.description.toLowerCase().includes(search)) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Sıralama
+            switch(sort) {
+                case 'newest':
+                    filteredMachines.sort((a, b) => new Date(b.created) - new Date(a.created));
+                    break;
+                case 'oldest':
+                    filteredMachines.sort((a, b) => new Date(a.created) - new Date(b.created));
+                    break;
+                case 'most-solved':
+                    filteredMachines.sort((a, b) => b.solved - a.solved);
+                    break;
+                case 'least-solved':
+                    filteredMachines.sort((a, b) => a.solved - b.solved);
+                    break;
+                case 'highest-points':
+                    filteredMachines.sort((a, b) => b.points - a.points);
+                    break;
+                case 'lowest-points':
+                    filteredMachines.sort((a, b) => a.points - b.points);
+                    break;
+            }
+            
+            currentPage = 1;
+            renderMachines();
+            updateActiveFilters();
+        }
+
+        // Aktif filtreleri güncelle
+        function updateActiveFilters() {
+            const filters = [];
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const access = document.getElementById('accessFilter').value;
+            const search = document.getElementById('searchFilter').value;
+            
+            if (difficulty !== 'all') {
+                filters.push(`<span class="filter-tag">${getDifficultyText(difficulty)} <i class="fas fa-times" onclick="removeFilter('difficulty')"></i></span>`);
+            }
+            
+            if (status !== 'all') {
+                const statusText = status === 'unsolved' ? 'Çözülmemiş' : status === 'in-progress' ? 'Devam Ediyor' : 'Çözülmüş';
+                filters.push(`<span class="filter-tag">${statusText} <i class="fas fa-times" onclick="removeFilter('status')"></i></span>`);
+            }
+            
+            if (access !== 'all') {
+                const accessText = access === 'vip' ? 'Sadece VIP' : 'Herkese Açık';
+                filters.push(`<span class="filter-tag">${accessText} <i class="fas fa-times" onclick="removeFilter('access')"></i></span>`);
+            }
+            
+            if (search) {
+                filters.push(`<span class="filter-tag">"${search}" <i class="fas fa-times" onclick="removeFilter('search')"></i></span>`);
+            }
+            
+            document.getElementById('activeFilters').innerHTML = filters.join('');
+        }
+
+        // Filtre kaldır
+        function removeFilter(type) {
+            if (type === 'difficulty') document.getElementById('difficultyFilter').value = 'all';
+            if (type === 'status') document.getElementById('statusFilter').value = 'all';
+            if (type === 'access') document.getElementById('accessFilter').value = 'all';
+            if (type === 'search') document.getElementById('searchFilter').value = '';
+            
+            applyFilters();
+        }
+
+        // Filtreleri sıfırla
+        function resetFilters() {
+            document.getElementById('difficultyFilter').value = 'all';
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('accessFilter').value = 'all';
+            document.getElementById('searchFilter').value = '';
+            document.getElementById('sortFilter').value = 'newest';
+            
+            filteredMachines = [...machines];
+            currentPage = 1;
+            renderMachines();
+            updateActiveFilters();
+        }
+
+        // Görünüm değiştir
+        function changeView(view) {
+            currentView = view;
+            const grid = document.getElementById('machineGrid');
+            const gridBtn = document.getElementById('gridViewBtn');
+            const listBtn = document.getElementById('listViewBtn');
+            
+            if (view === 'grid') {
+                grid.classList.remove('list-view');
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            } else {
+                grid.classList.add('list-view');
+                listBtn.classList.add('active');
+                gridBtn.classList.remove('active');
+            }
+            
+            renderMachines();
+        }
+
+        // Makine başlat
+        function startMachine(machineId) {
+            if (!checkAuth()) {
+                alert('Lütfen önce giriş yapın!');
+                window.location.href = '/login';
+                return;
+            }
+            
+            const machine = machines.find(m => m.id === machineId);
+            
+            if (machine.isVIP && !isUserVIP()) {
+                alert('Bu makine VIP üyelik gerektiriyor!');
+                window.location.href = '/vip';
+                return;
+            }
+            
+            document.getElementById('modalMachineName').textContent = `${machine.name} başlatılıyor...`;
+            document.getElementById('startModal').classList.add('show');
+            
+            // 2 saniye sonra makine sayfasına yönlendir
+            setTimeout(() => {
+                window.location.href = `/machine/${machineId}`;
+            }, 2000);
+        }
+
+        // Modal kapat
+        function closeModal() {
+            document.getElementById('startModal').classList.remove('show');
+        }
+
+        // Yardımcı fonksiyonlar
+        function getDifficultyText(difficulty) {
+            const texts = {
+                'easy': 'Kolay',
+                'medium': 'Orta',
+                'hard': 'Zor',
+                'expert': 'Uzman'
+            };
+            return texts[difficulty] || difficulty;
+        }
+
+        function getDifficultyIcon(difficulty) {
+            const icons = {
+                'easy': 'seedling',
+                'medium': 'chart-line',
+                'hard': 'skull',
+                'expert': 'crown'
+            };
+            return icons[difficulty] || 'flag';
+        }
+
+        function checkAuth() {
+            // Gerçek uygulamada token kontrolü yapılacak
+            return localStorage.getItem('access_token') !== null;
+        }
+
+        function isUserVIP() {
+            // Gerçek uygulamada JWT'den VIP durumu kontrol edilecek
+            return false;
+        }
+
+        function checkUserStatus() {
+            // Kullanıcı giriş yapmış mı kontrol et
+            if (!checkAuth()) {
+                // Guest kullanıcı için butonları devre dışı bırak
+            }
+        }
+
+        // Arama inputu için debounce
+        let searchTimeout;
+        document.getElementById('searchFilter').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makine Detayı - HACKLAB-01 - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01001101 01100001 01100011 01101000 01101001 01101110 01100101 00100000 01000100 01100101 01110100 01100001 01111001 00100000 01000011 01010100 01000110";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1600px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        .breadcrumb a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00ff9d;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+            color: #2a3a4a;
+        }
+
+        /* Makine Header */
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .machine-title {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .machine-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 2px solid #00ff9d;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #00ff9d;
+        }
+
+        .machine-info h1 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.5rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-meta {
+            display: flex;
+            gap: 2rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .machine-meta i {
+            color: #00ff9d;
+            margin-right: 0.5rem;
+        }
+
+        .machine-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-start {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 10px;
+            color: #0a0f0f;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.4);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-vip {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            border: none;
+            border-radius: 10px;
+            color: #0a0f0f;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        /* Ana İçerik Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Sol Panel - Sorular */
+        .questions-panel {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .panel-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-header p {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .questions-list {
+            padding: 1rem;
+        }
+
+        .question-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .question-item:hover {
+            border-color: #00ff9d;
+            transform: translateX(5px);
+        }
+
+        .question-item.active {
+            border-color: #00ff9d;
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .question-item.solved {
+            border-color: #00ff9d;
+            opacity: 0.8;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .question-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .status-solved {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .status-unsolved {
+            background: #2a3a4a;
+            color: #b0b0b0;
+        }
+
+        .question-points {
+            font-size: 0.8rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #ffbd2e;
+            cursor: pointer;
+            padding: 0.3rem 0;
+        }
+
+        .question-hint:hover {
+            text-decoration: underline;
+        }
+
+        .hint-cost {
+            background: #2a3a4a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            color: #b0b0b0;
+        }
+
+        /* Orta Panel - Terminal */
+        .terminal-panel {
+            background: #0a0f0f;
+            border: 1px solid #00ff9d;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.2);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: #1a1f2f;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00ff9d;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .terminal-title {
+            color: #00ff9d;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .terminal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            background: transparent;
+            border: none;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 0.3rem 0.5rem;
+        }
+
+        .terminal-btn:hover {
+            color: #00ff9d;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: #00ff9d;
+            overflow-y: auto;
+            background: #0a0f0f;
+        }
+
+        .terminal-line {
+            margin: 0.3rem 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .terminal-prompt {
+            color: #00ff9d;
+            margin-right: 0.5rem;
+            font-weight: 600;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff9d;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s infinite;
+            width: 8px;
+            height: 1.2rem;
+            background: #00ff9d;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Sağ Panel - Bilgiler */
+        .info-panel {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .info-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .info-section:last-child {
+            border-bottom: none;
+        }
+
+        .info-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .info-stat {
+            text-align: center;
+        }
+
+        .info-stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.3rem;
+            color: #e0e0e0;
+        }
+
+        .info-stat-label {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-easy {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+            border: 1px solid #ffbd2e;
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 95, 86, 0.2);
+            color: #ff5f56;
+            border: 1px solid #ff5f56;
+        }
+
+        .difficulty-expert {
+            background: rgba(255, 0, 200, 0.2);
+            color: #ff00c8;
+            border: 1px solid #ff00c8;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 3px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            color: #b0b0b0;
+        }
+
+        .solver-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .solver-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .solver-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #00ff9d;
+        }
+
+        .solver-info {
+            flex: 1;
+        }
+
+        .solver-name {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+
+        .solver-time {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .notes-area {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            padding: 0.8rem;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .notes-area:focus {
+            outline: none;
+            border-color: #00ff9d;
+        }
+
+        .btn-save-notes {
+            width: 100%;
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-save-notes:hover {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        /* Flag Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 10px;
+            max-width: 450px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff5f56;
+        }
+
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+
+        .modal-body p {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        .flag-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .flag-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+
+        .flag-input:focus {
+            outline: none;
+            border-color: #00ff9d;
+        }
+
+        .btn-submit-flag {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit-flag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Hint Modal */
+        .hint-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #ffbd2e;
+            padding: 1rem;
+            border-radius: 5px;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+
+        /* Timer */
+        .timer {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            color: #00ff9d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timer.warning {
+            color: #ffbd2e;
+        }
+
+        .timer.danger {
+            color: #ff5f56;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 300px 1fr 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .machine-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .machine-actions {
+                width: 100%;
+            }
+            
+            .btn-start, .btn-vip {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .machine-info h1 {
+                font-size: 2rem;
+            }
+            
+            .machine-meta {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .terminal-panel {
+                height: 450px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines" class="active">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span id="userPoints" style="color: #00ff9d;">👑 1250 puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="window.location.href='/profile'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Ana Sayfa</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/machines">Makineler</a>
+            <i class="fas fa-chevron-right"></i>
+            <span style="color: #00ff9d;">HACKLAB-01</span>
+        </div>
+
+        <!-- Makine Header -->
+        <div class="machine-header">
+            <div class="machine-title">
+                <div class="machine-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="machine-info">
+                    <h1>HACKLAB-01</h1>
+                    <div class="machine-meta">
+                        <span><i class="fas fa-user"></i> @cyber_ghost</span>
+                        <span><i class="fas fa-calendar"></i> 15.01.2024</span>
+                        <span><i class="fas fa-eye"></i> 2.5k görüntülenme</span>
+                        <span><i class="fas fa-flag"></i> 1.2k çözüm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="machine-actions">
+                <button class="btn-start" onclick="startMachine()">
+                    <i class="fas fa-play"></i>
+                    MAKİNEYİ BAŞLAT
+                </button>
+            </div>
+        </div>
+
+        <!-- Ana İçerik Grid -->
+        <div class="content-grid">
+            <!-- Sol Panel - Sorular -->
+            <div class="questions-panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-tasks"></i> SORULAR</h3>
+                    <p>3 soru • 150 puan</p>
+                </div>
+                <div class="questions-list" id="questionsList">
+                    <!-- Soru 1 -->
+                    <div class="question-item active" data-question="1">
+                        <div class="question-header">
+                            <span class="question-title">Soru 1: Web Keşfi</span>
+                            <span class="question-status status-unsolved">
+                                <i class="fas fa-question"></i>
+                            </span>
+                        </div>
+                        <div class="question-points">
+                            <i class="fas fa-star"></i> 50 puan
+                        </div>
+                        <div class="question-hint" onclick="showHint(1)">
+                            <i class="fas fa-lightbulb"></i>
+                            İpucu Göster
+                            <span class="hint-cost">10 puan</span>
+                        </div>
+                    </div>
+
+                    <!-- Soru 2 -->
+                    <div class="question-item" data-question="2">
+                        <div class="question-header">
+                            <span class="question-title">Soru 2: SQL Injection</span>
+                            <span class="question-status status-unsolved">
+                                <i class="fas fa-question"></i>
+                            </span>
+                        </div>
+                        <div class="question-points">
+                            <i class="fas fa-star"></i> 50 puan
+                        </div>
+                        <div class="question-hint" onclick="showHint(2)">
+                            <i class="fas fa-lightbulb"></i>
+                            İpucu Göster
+                            <span class="hint-cost">10 puan</span>
+                        </div>
+                    </div>
+
+                    <!-- Soru 3 -->
+                    <div class="question-item" data-question="3">
+                        <div class="question-header">
+                            <span class="question-title">Soru 3: Privilege Escalation</span>
+                            <span class="question-status status-unsolved">
+                                <i class="fas fa-question"></i>
+                            </span>
+                        </div>
+                        <div class="question-points">
+                            <i class="fas fa-star"></i> 50 puan
+                        </div>
+                        <div class="question-hint" onclick="showHint(3)">
+                            <i class="fas fa-lightbulb"></i>
+                            İpucu Göster
+                            <span class="hint-cost">10 puan</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orta Panel - Terminal -->
+            <div class="terminal-panel">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <div class="terminal-dot dot-red"></div>
+                        <div class="terminal-dot dot-yellow"></div>
+                        <div class="terminal-dot dot-green"></div>
+                    </div>
+                    <div class="terminal-title">
+                        <i class="fas fa-terminal"></i> root@hacklab-01:~ - 192.168.1.100
+                    </div>
+                    <div class="terminal-actions">
+                        <button class="terminal-btn" onclick="clearTerminal()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="terminal-btn" onclick="copyTerminal()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="terminal-btn" onclick="fullscreenTerminal()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                    <div class="terminal-line">Linux hacklab-01 5.4.0-x86_64 GNU/Linux</div>
+                    <div class="terminal-line">Ubuntu 22.04.3 LTS</div>
+                    <div class="terminal-line">System information: 2GB RAM, 20GB disk</div>
+                    <div class="terminal-line">Last login: Thu Jan 18 14:23:45 2024</div>
+                    <div class="terminal-line"></div>
+                    <div class="terminal-line">Welcome to HACKLAB-01!</div>
+                    <div class="terminal-line">This machine contains 3 flags. Good luck!</div>
+                    <div class="terminal-line"></div>
+                    <div class="terminal-line"><span style="color: #ffbd2e;">root@hacklab-01:~$</span> ls -la</div>
+                    <div class="terminal-line">total 32</div>
+                    <div class="terminal-line">drwxr-xr-x 1 root root  4096 Jan 18 14:23 .</div>
+                    <div class="terminal-line">drwxr-xr-x 1 root root  4096 Jan 18 14:23 ..</div>
+                    <div class="terminal-line">-rw-r--r-- 1 root root    64 Jan 18 14:23 flag1.txt</div>
+                    <div class="terminal-line">-rw-r--r-- 1 root root   128 Jan 18 14:23 README.md</div>
+                    <div class="terminal-line">drwxr-xr-x 1 root root  4096 Jan 18 14:23 scripts</div>
+                    <div class="terminal-line">-rw-r--r-- 1 root root   256 Jan 18 14:23 notes.txt</div>
+                    <div class="terminal-line"></div>
+                    
+                    <div class="terminal-input-line">
+                        <span class="terminal-prompt">root@hacklab-01:~$</span>
+                        <input type="text" class="terminal-input" id="terminalInput" placeholder="_" autofocus>
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel - Bilgiler -->
+            <div class="info-panel">
+                <!-- Makine İstatistikleri -->
+                <div class="info-section">
+                    <div class="info-title">
+                        <i class="fas fa-chart-bar"></i>
+                        MAKİNE İSTATİSTİKLERİ
+                    </div>
+                    <div class="difficulty-badge difficulty-easy">
+                        <i class="fas fa-seedling"></i> Kolay
+                    </div>
+                    <div class="info-stats">
+                        <div class="info-stat">
+                            <div class="info-stat-value">3</div>
+                            <div class="info-stat-label">Toplam Soru</div>
+                        </div>
+                        <div class="info-stat">
+                            <div class="info-stat-value">1.2k</div>
+                            <div class="info-stat-label">Çözüm</div>
+                        </div>
+                        <div class="info-stat">
+                            <div class="info-stat-value">150</div>
+                            <div class="info-stat-label">Toplam Puan</div>
+                        </div>
+                        <div class="info-stat">
+                            <div class="info-stat-value">%45</div>
+                            <div class="info-stat-label">Çözülme</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etiketler -->
+                <div class="info-section">
+                    <div class="info-title">
+                        <i class="fas fa-tags"></i>
+                        ETİKETLER
+                    </div>
+                    <div class="tags-container">
+                        <span class="tag">#web</span>
+                        <span class="tag">#sql</span>
+                        <span class="tag">#easy</span>
+                        <span class="tag">#privesc</span>
+                        <span class="tag">#linux</span>
+                        <span class="tag">#nmap</span>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="info-section">
+                    <div class="info-title">
+                        <i class="fas fa-hourglass-half"></i>
+                        KALAN SÜRE
+                    </div>
+                    <div class="timer" id="timer">
+                        <i class="fas fa-clock"></i>
+                        01:45:32
+                    </div>
+                    <p style="color: #6a7a8a; font-size: 0.8rem; margin-top: 0.5rem;">
+                        Makine 2 saat sonra otomatik kapanacak
+                    </p>
+                </div>
+
+                <!-- Son Çözenler -->
+                <div class="info-section">
+                    <div class="info-title">
+                        <i class="fas fa-users"></i>
+                        SON ÇÖZENLER
+                    </div>
+                    <div class="solver-list">
+                        <div class="solver-item">
+                            <img src="https://www.gravatar.com/avatar/11111111111111111111111111111111?d=mp&f=y" alt="avatar" class="solver-avatar">
+                            <div class="solver-info">
+                                <div class="solver-name">@root_hunter</div>
+                                <div class="solver-time">5 dakika önce</div>
+                            </div>
+                        </div>
+                        <div class="solver-item">
+                            <img src="https://www.gravatar.com/avatar/22222222222222222222222222222222?d=mp&f=y" alt="avatar" class="solver-avatar">
+                            <div class="solver-info">
+                                <div class="solver-name">@byte_bender</div>
+                                <div class="solver-time">12 dakika önce</div>
+                            </div>
+                        </div>
+                        <div class="solver-item">
+                            <img src="https://www.gravatar.com/avatar/33333333333333333333333333333333?d=mp&f=y" alt="avatar" class="solver-avatar">
+                            <div class="solver-info">
+                                <div class="solver-name">@payload_master</div>
+                                <div class="solver-time">25 dakika önce</div>
+                            </div>
+                        </div>
+                        <div class="solver-item">
+                            <img src="https://www.gravatar.com/avatar/44444444444444444444444444444444?d=mp&f=y" alt="avatar" class="solver-avatar">
+                            <div class="solver-info">
+                                <div class="solver-name">@shell_shocker</div>
+                                <div class="solver-time">1 saat önce</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notlar -->
+                <div class="info-section">
+                    <div class="info-title">
+                        <i class="fas fa-pencil-alt"></i>
+                        NOTLARIM
+                    </div>
+                    <textarea class="notes-area" id="notes" placeholder="Makineyle ilgili notlarınızı buraya yazın..."></textarea>
+                    <button class="btn-save-notes" onclick="saveNotes()">
+                        <i class="fas fa-save"></i> Notları Kaydet
+                    </button>
+                </div>
+
+                <!-- Flag Gönder Butonu -->
+                <div class="info-section">
+                    <button class="btn-start" onclick="showFlagModal()" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-flag"></i>
+                        FLAG GÖNDER
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flag Modal -->
+    <div class="modal" id="flagModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-flag"></i> FLAG GÖNDER</h3>
+                <button class="modal-close" onclick="closeFlagModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="selectedQuestion">Soru 1: Web Keşfi</p>
+                <div class="flag-input-group">
+                    <input type="text" class="flag-input" id="flagInput" placeholder="FLAG{...}" autocomplete="off">
+                    <button class="btn-submit-flag" onclick="submitFlag()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hint Modal -->
+    <div class="modal" id="hintModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-lightbulb"></i> İPUCU</h3>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="hintQuestion">Soru 1 İpucu</p>
+                <div class="hint-content" id="hintContent">
+                    Web sunucusunun 8080 portunda çalıştığını unutmayın. /admin dizinini kontrol edin.
+                </div>
+                <p style="color: #ffbd2e; margin-top: 1rem;">
+                    <i class="fas fa-coins"></i> 10 puan harcandı
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Makine ID'sini URL'den al (gerçek uygulamada)
+        const urlParams = new URLSearchParams(window.location.search);
+        const machineId = window.location.pathname.split('/').pop();
+
+        // Mock makine verisi
+        const machineData = {
+            id: 1,
+            name: "HACKLAB-01",
+            description: "Web güvenliği ve SQL injection pratiği için temel seviye makine.",
+            difficulty: "easy",
+            points: 150,
+            solved: 1245,
+            views: 2500,
+            totalQuestions: 3,
+            solvedQuestions: 0,
+            isVIP: false,
+            creator: "@cyber_ghost",
+            created: "2024-01-15",
+            tags: ["web", "sql", "easy", "privesc", "linux", "nmap"],
+            questions: [
+                {
+                    id: 1,
+                    title: "Web Keşfi",
+                    points: 50,
+                    hint: "Web sunucusunun 8080 portunda çalıştığını unutmayın. /admin dizinini kontrol edin.",
+                    hintCost: 10,
+                    solved: false
+                },
+                {
+                    id: 2,
+                    title: "SQL Injection",
+                    points: 50,
+                    hint: "Login formunda SQL injection zafiyeti var. ' OR 1=1-- dene.",
+                    hintCost: 10,
+                    solved: false
+                },
+                {
+                    id: 3,
+                    title: "Privilege Escalation",
+                    points: 50,
+                    hint: "Sudo -l komutunu kontrol et. /usr/bin/python ile root yetkisi alabilirsin.",
+                    hintCost: 10,
+                    solved: false
+                }
+            ],
+            recentSolvers: [
+                { username: "@root_hunter", time: "5 dakika önce", avatar: "111..." },
+                { username: "@byte_bender", time: "12 dakika önce", avatar: "222..." },
+                { username: "@payload_master", time: "25 dakika önce", avatar: "333..." },
+                { username: "@shell_shocker", time: "1 saat önce", avatar: "444..." }
+            ]
+        };
+
+        let currentQuestion = 1;
+        let timerInterval;
+        let timeRemaining = 7200; // 2 saat (saniye)
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            loadMachineData();
+            startTimer();
+            loadNotes();
+            setupTerminal();
+            checkUserStatus();
+        });
+
+        // Makine verilerini yükle
+        function loadMachineData() {
+            document.title = `${machineData.name} - Makine Detayı - CTF HACK PLATFORMU`;
+            // Diğer verileri güncelle
+        }
+
+        // Terminal işlemleri
+        function setupTerminal() {
+            const terminalInput = document.getElementById('terminalInput');
+            terminalInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    executeCommand(this.value);
+                    this.value = '';
+                }
+            });
+        }
+
+        function executeCommand(command) {
+            const terminalBody = document.getElementById('terminalBody');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Komutu terminale ekle
+            terminalBody.innerHTML += `<div class="terminal-line"><span style="color: #ffbd2e;">root@hacklab-01:~$</span> ${command}</div>`;
+            
+            // Komut işleme (mock)
+            if (command === 'ls') {
+                terminalBody.innerHTML += `<div class="terminal-line">flag1.txt  README.md  scripts  notes.txt</div>`;
+            } else if (command === 'cat flag1.txt') {
+                terminalBody.innerHTML += `<div class="terminal-line">FLAG{web_exploration_123}</div>`;
+            } else if (command === 'help') {
+                terminalBody.innerHTML += `<div class="terminal-line">Kullanılabilir komutlar: ls, cat, pwd, whoami, help</div>`;
+            } else if (command.startsWith('cat ')) {
+                terminalBody.innerHTML += `<div class="terminal-line">Dosya bulunamadı veya okuma izniniz yok.</div>`;
+            } else if (command === 'clear') {
+                clearTerminal();
+                return;
+            } else if (command.trim() !== '') {
+                terminalBody.innerHTML += `<div class="terminal-line">Komut bulunamadı: ${command}</div>`;
+            }
+            
+            // Terminali en alta kaydır
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+
+        function clearTerminal() {
+            const terminalBody = document.getElementById('terminalBody');
+            terminalBody.innerHTML = `
+                <div class="terminal-line">Linux hacklab-01 5.4.0-x86_64 GNU/Linux</div>
+                <div class="terminal-line">Ubuntu 22.04.3 LTS</div>
+                <div class="terminal-line">System information: 2GB RAM, 20GB disk</div>
+                <div class="terminal-line">Last login: Thu Jan 18 14:23:45 2024</div>
+                <div class="terminal-line"></div>
+                <div class="terminal-line">Terminal temizlendi.</div>
+                <div class="terminal-line"></div>
+            `;
+        }
+
+        function copyTerminal() {
+            const terminalBody = document.getElementById('terminalBody');
+            const text = terminalBody.innerText;
+            navigator.clipboard.writeText(text);
+            alert('Terminal içeriği kopyalandı!');
+        }
+
+        function fullscreenTerminal() {
+            const terminal = document.querySelector('.terminal-panel');
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                terminal.requestFullscreen();
+            }
+        }
+
+        // Soru seçimi
+        document.querySelectorAll('.question-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.question-item').forEach(q => q.classList.remove('active'));
+                this.classList.add('active');
+                currentQuestion = this.dataset.question;
+            });
+        });
+
+        // Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    expireMachine();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeRemaining / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+            
+            const timerElement = document.getElementById('timer');
+            timerElement.innerHTML = `<i class="fas fa-clock"></i> ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeRemaining < 600) { // 10 dakikadan az
+                timerElement.classList.add('danger');
+            } else if (timeRemaining < 1800) { // 30 dakikadan az
+                timerElement.classList.add('warning');
+            }
+        }
+
+        function expireMachine() {
+            alert('Makine süresi doldu! Ana sayfaya yönlendiriliyorsunuz.');
+            window.location.href = '/machines';
+        }
+
+        // Makine başlat
+        function startMachine() {
+            if (!checkAuth()) {
+                alert('Lütfen önce giriş yapın!');
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Timer'ı sıfırla
+            timeRemaining = 7200;
+            updateTimerDisplay();
+            
+            alert('Makine başlatıldı! Terminal bağlantısı kuruluyor...');
+        }
+
+        // Flag modal
+        function showFlagModal() {
+            if (!checkAuth()) {
+                alert('Lütfen önce giriş yapın!');
+                window.location.href = '/login';
+                return;
+            }
+            
+            const question = machineData.questions[currentQuestion - 1];
+            document.getElementById('selectedQuestion').textContent = `Soru ${currentQuestion}: ${question.title}`;
+            document.getElementById('flagModal').classList.add('show');
+        }
+
+        function closeFlagModal() {
+            document.getElementById('flagModal').classList.remove('show');
+            document.getElementById('flagInput').value = '';
+        }
+
+        function submitFlag() {
+            const flag = document.getElementById('flagInput').value;
+            
+            if (!flag) {
+                alert('Lütfen bir flag girin!');
+                return;
+            }
+            
+            // Mock flag kontrolü
+            if (flag === 'FLAG{web_exploration_123}' && currentQuestion === 1) {
+                // Soruyu çözülmüş olarak işaretle
+                const questionItem = document.querySelector(`.question-item[data-question="${currentQuestion}"]`);
+                const statusIcon = questionItem.querySelector('.question-status i');
+                
+                statusIcon.className = 'fas fa-check';
+                questionItem.querySelector('.question-status').classList.remove('status-unsolved');
+                questionItem.querySelector('.question-status').classList.add('status-solved');
+                questionItem.classList.add('solved');
+                
+                // Puan ekle
+                const userPoints = document.getElementById('userPoints');
+                const currentPoints = parseInt(userPoints.textContent.match(/\d+/)[0]);
+                userPoints.innerHTML = `👑 ${currentPoints + 50} puan`;
+                
+                alert('✅ Tebrikler! Doğru flag! 50 puan kazandınız.');
+                closeFlagModal();
+            } else {
+                alert('❌ Yanlış flag! Tekrar dene.');
+            }
+        }
+
+        // Hint modal
+        function showHint(questionId) {
+            if (!checkAuth()) {
+                alert('Lütfen önce giriş yapın!');
+                window.location.href = '/login';
+                return;
+            }
+            
+            const question = machineData.questions[questionId - 1];
+            
+            // Puan kontrolü
+            const userPoints = document.getElementById('userPoints');
+            const currentPoints = parseInt(userPoints.textContent.match(/\d+/)[0]);
+            
+            if (currentPoints < question.hintCost) {
+                alert(`Yetersiz puan! İpucu için ${question.hintCost} puan gerekiyor.`);
+                return;
+            }
+            
+            document.getElementById('hintQuestion').textContent = `Soru ${questionId}: ${question.title}`;
+            document.getElementById('hintContent').textContent = question.hint;
+            document.getElementById('hintModal').classList.add('show');
+            
+            // Puan düş
+            userPoints.innerHTML = `👑 ${currentPoints - question.hintCost} puan`;
+        }
+
+        function closeHintModal() {
+            document.getElementById('hintModal').classList.remove('show');
+        }
+
+        // Notlar
+        function saveNotes() {
+            const notes = document.getElementById('notes').value;
+            localStorage.setItem(`machine_${machineId}_notes`, notes);
+            alert('Notlar kaydedildi!');
+        }
+
+        function loadNotes() {
+            const notes = localStorage.getItem(`machine_${machineId}_notes`);
+            if (notes) {
+                document.getElementById('notes').value = notes;
+            }
+        }
+
+        // Kullanıcı durumu kontrolü
+        function checkAuth() {
+            return localStorage.getItem('access_token') !== null;
+        }
+
+        function checkUserStatus() {
+            if (!checkAuth()) {
+                // Guest kullanıcı
+                document.getElementById('userPoints').innerHTML = '👤 Misafir';
+                document.querySelector('.btn-start').disabled = true;
+            }
+        }
+
+        // Sayfadan ayrılırken
+        window.addEventListener('beforeunload', function() {
+            clearInterval(timerInterval);
+        });
+    </script>
+</body>
+</html>

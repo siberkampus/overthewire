@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Üyelik - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01010110 01001001 01010000 00100000 01001101 01100101 01101101 01100010 01100101 01110010 01110011 01101000 01101001 01110000 00100000 01000011 01010100 01000110";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .user-points {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            color: #00ff9d;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        .breadcrumb a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00ff9d;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+            color: #2a3a4a;
+        }
+
+        /* Header */
+        .vip-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .vip-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ffd700, #ffa500, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .vip-subtitle {
+            color: #b0b0b0;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Mevcut VIP Durumu */
+        .current-vip {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border: 1px solid #ffd700;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .vip-status-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .vip-crown {
+            font-size: 3rem;
+            color: #ffd700;
+        }
+
+        .vip-status-text h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .vip-status-text p {
+            color: #b0b0b0;
+        }
+
+        .vip-timer {
+            text-align: center;
+        }
+
+        .timer-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            color: #ffd700;
+        }
+
+        .timer-label {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .btn-renew {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            border: none;
+            border-radius: 10px;
+            color: #0a0f0f;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-renew:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* VIP Avantajları */
+        .benefits-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            color: #00ff9d;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title::before {
+            content: '[';
+            margin-right: 10px;
+            color: #00ff9d;
+        }
+
+        .section-title::after {
+            content: ']';
+            margin-left: 10px;
+            color: #00ff9d;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .benefit-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .benefit-card.vip {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+        }
+
+        .benefit-icon {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.3rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-desc {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-note {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        .vip-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #ffd700;
+            color: #0a0f0f;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Fiyatlandırma */
+        .pricing-section {
+            margin-bottom: 4rem;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pricing-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .pricing-card.popular {
+            border: 2px solid #ffd700;
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #0a0f0f;
+            padding: 0.3rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .pricing-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            margin-bottom: 1.5rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+
+        .price small {
+            font-size: 1rem;
+            color: #6a7a8a;
+        }
+
+        .price-period {
+            color: #b0b0b0;
+            margin-top: 0.3rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            color: #b0b0b0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-features i.fa-check {
+            color: #00ff9d;
+        }
+
+        .pricing-features i.fa-times {
+            color: #ff5f56;
+        }
+
+        .pricing-features .vip-only {
+            color: #ffd700;
+        }
+
+        .btn-select {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            color: #ffd700;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-select:hover {
+            background: #ffd700;
+            color: #0a0f0f;
+        }
+
+        .btn-select.selected {
+            background: #ffd700;
+            color: #0a0f0f;
+        }
+
+        /* Kampanya Kodu */
+        .campaign-section {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .campaign-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .campaign-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .campaign-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+
+        .campaign-input:focus {
+            outline: none;
+            border-color: #00ff9d;
+        }
+
+        .btn-apply {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-apply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ödeme Yöntemleri */
+        .payment-section {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .payment-method {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: #00ff9d;
+        }
+
+        .payment-method.selected {
+            border-color: #00ff9d;
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .payment-method i {
+            font-size: 1.5rem;
+        }
+
+        .payment-method span {
+            font-weight: 600;
+        }
+
+        .payment-details {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .payment-row:last-child {
+            border-bottom: none;
+        }
+
+        .payment-total {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.3rem;
+            color: #00ff9d;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            border: none;
+            border-radius: 8px;
+            color: #0a0f0f;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* VIP Makineler Önizleme */
+        .preview-section {
+            margin-bottom: 4rem;
+        }
+
+        .machines-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .machine-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: 0.3s;
+            opacity: 0.7;
+            filter: blur(1px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .machine-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        .machine-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #ffd700;
+            z-index: 3;
+        }
+
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-name {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .machine-difficulty {
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+        }
+
+        .difficulty-expert {
+            background: rgba(255, 0, 200, 0.2);
+            color: #ff00c8;
+        }
+
+        .machine-points {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-tags {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 3px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.6rem;
+            color: #b0b0b0;
+        }
+
+        /* SSS */
+        .faq-section {
+            margin-bottom: 4rem;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .faq-item {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .faq-question {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .faq-answer {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Testimonials */
+        .testimonials-section {
+            margin-bottom: 4rem;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #ffd700;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+        }
+
+        .testimonial-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-name {
+            font-family: 'Share Tech Mono', monospace;
+            color: #ffd700;
+            margin-bottom: 0.3rem;
+        }
+
+        .testimonial-role {
+            color: #b0b0b0;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            color: #e0e0e0;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-rating {
+            color: #ffd700;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 15, 20, 0.95);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid #00ff9d;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section ul li a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #00ff9d;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff5f56;
+        }
+
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            color: #0a0f0f;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-modal-secondary {
+            background: transparent;
+            border: 1px solid #2a3a4a;
+            color: #b0b0b0;
+        }
+
+        .btn-modal-secondary:hover {
+            border-color: #ff5f56;
+            color: #ff5f56;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .current-vip {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .vip-status-info {
+                justify-content: center;
+            }
+            
+            .pricing-card.popular {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .vip-title {
+                font-size: 2rem;
+            }
+            
+            .campaign-form {
+                flex-direction: column;
+            }
+            
+            .payment-methods {
+                flex-direction: column;
+            }
+            
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span class="user-points">👑 1,250 Puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="window.location.href='/dashboard'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Ana Sayfa</a>
+            <i class="fas fa-chevron-right"></i>
+            <span style="color: #00ff9d;">VIP Üyelik</span>
+        </div>
+
+        <!-- Header -->
+        <div class="vip-header">
+            <h1 class="vip-title">VIP ÜYELİK</h1>
+            <p class="vip-subtitle">Ayrıcalıklı dünyaya adım atın, sınırları zorlayın</p>
+        </div>
+
+        <!-- Mevcut VIP Durumu (VIP üyeler için) -->
+        <div class="current-vip" id="currentVIP">
+            <div class="vip-status-info">
+                <div class="vip-crown">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="vip-status-text">
+                    <h3>VIP Üyelik Aktif</h3>
+                    <p>Tüm ayrıcalıklara sahipsiniz! Teşekkür ederiz.</p>
+                </div>
+            </div>
+            <div class="vip-timer">
+                <div class="timer-value" id="vipTimer">15 gün 7 saat</div>
+                <div class="timer-label">Kalan Süre</div>
+            </div>
+            <button class="btn-renew" onclick="renewVIP()">
+                <i class="fas fa-sync-alt"></i> Yenile
+            </button>
+        </div>
+
+        <!-- VIP Avantajları -->
+        <div class="benefits-section">
+            <h2 class="section-title">VIP AVANTAJLARI</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card vip">
+                    <div class="vip-badge">VIP</div>
+                    <div class="benefit-icon">
+                        <i class="fas fa-lock-open"></i>
+                    </div>
+                    <h3 class="benefit-title">Özel VIP Makineler</h3>
+                    <p class="benefit-desc">Sadece VIP üyelere özel 50+ zorlu makineye erişim</p>
+                    <p class="benefit-note">Her ay yeni makineler ekleniyor</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="benefit-title">Çift Puan</h3>
+                    <p class="benefit-desc">Tüm çözümlerden 2 kat daha fazla puan kazanın</p>
+                    <p class="benefit-note">Normalde 100 puan, VIP'ler için 200 puan</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="benefit-title">Özel Rozetler</h3>
+                    <p class="benefit-desc">VIP üyelere özel 10+ rozet ve profil görünümü</p>
+                    <p class="benefit-note">Profilinizde VIP rozeti görünsün</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="benefit-title">Öncelikli Destek</h3>
+                    <p class="benefit-desc">Sorularınıza öncelikli yanıt ve 7/24 destek</p>
+                    <p class="benefit-note">Ortalama 1 saat içinde yanıt</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="benefit-title">Detaylı İstatistikler</h3>
+                    <p class="benefit-desc">Gelişmiş analitik ve performans grafikleri</p>
+                    <p class="benefit-note">Çözümlerinizin detaylı analizi</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="benefit-title">Özel Topluluk</h3>
+                    <p class="benefit-desc">VIP üyeler için özel Discord kanalı ve etkinlikler</p>
+                    <p class="benefit-note">Diğer VIP üyelerle tanışın</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fiyatlandırma -->
+        <div class="pricing-section">
+            <h2 class="section-title">ÜYELİK PAKETLERİ</h2>
+            <div class="pricing-grid">
+                <!-- Aylık Paket -->
+                <div class="pricing-card" onclick="selectPackage('monthly')">
+                    <div class="pricing-name">Aylık</div>
+                    <div class="pricing-price">
+                        <span class="price">₺99 <small>/ay</small></span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Tüm VIP makinelere erişim</li>
+                        <li><i class="fas fa-check"></i> Çift puan kazanma</li>
+                        <li><i class="fas fa-check"></i> Özel VIP rozeti</li>
+                        <li><i class="fas fa-check"></i> Öncelikli destek</li>
+                        <li><i class="fas fa-check"></i> Detaylı istatistikler</li>
+                        <li><i class="fas fa-check"></i> Özel Discord kanalı</li>
+                    </ul>
+                    <button class="btn-select" id="btn-monthly">SEÇ</button>
+                </div>
+
+                <!-- Yıllık Paket (Popüler) -->
+                <div class="pricing-card popular" onclick="selectPackage('yearly')">
+                    <div class="popular-badge">EN POPÜLER</div>
+                    <div class="pricing-name">Yıllık</div>
+                    <div class="pricing-price">
+                        <span class="price">₺999 <small>/yıl</small></span>
+                        <div class="price-period">(₺83.25/ay - 2 ay bedava)</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Tüm VIP makinelere erişim</li>
+                        <li><i class="fas fa-check"></i> Çift puan kazanma</li>
+                        <li><i class="fas fa-check"></i> Özel VIP rozeti</li>
+                        <li><i class="fas fa-check"></i> Öncelikli destek</li>
+                        <li><i class="fas fa-check"></i> Detaylı istatistikler</li>
+                        <li><i class="fas fa-check"></i> Özel Discord kanalı</li>
+                        <li><i class="fas fa-check vip-only">✨ 2 ay bedava (₺198 tasarruf)</li>
+                        <li><i class="fas fa-check vip-only">🎁 Özel yıllık üye rozeti</li>
+                    </ul>
+                    <button class="btn-select selected" id="btn-yearly">SEÇİLDİ</button>
+                </div>
+
+                <!-- Ömür Boyu -->
+                <div class="pricing-card" onclick="selectPackage('lifetime')">
+                    <div class="pricing-name">Ömür Boyu</div>
+                    <div class="pricing-price">
+                        <span class="price">₺2,999 <small>tek sefer</small></span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Tüm VIP makinelere erişim</li>
+                        <li><i class="fas fa-check"></i> Çift puan kazanma</li>
+                        <li><i class="fas fa-check"></i> Özel VIP rozeti</li>
+                        <li><i class="fas fa-check"></i> Öncelikli destek</li>
+                        <li><i class="fas fa-check"></i> Detaylı istatistikler</li>
+                        <li><i class="fas fa-check"></i> Özel Discord kanalı</li>
+                        <li><i class="fas fa-check vip-only">🔥 Sınırsız süre</li>
+                        <li><i class="fas fa-check vip-only">👑 Ömür boyu üye rozeti</li>
+                        <li><i class="fas fa-check vip-only">⭐ Tüm gelecek özellikler dahil</li>
+                    </ul>
+                    <button class="btn-select" id="btn-lifetime">SEÇ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kampanya Kodu -->
+        <div class="campaign-section">
+            <h3 class="campaign-title">KAMPANYA KODUNUZ VAR MI?</h3>
+            <div class="campaign-form">
+                <input type="text" class="campaign-input" id="campaignCode" placeholder="Kampanya kodunu girin">
+                <button class="btn-apply" onclick="applyCampaign()">
+                    <i class="fas fa-check"></i> Uygula
+                </button>
+            </div>
+            <div id="campaignMessage" style="text-align: center; margin-top: 1rem; color: #ff5f56;"></div>
+        </div>
+
+        <!-- Ödeme Yöntemleri -->
+        <div class="payment-section">
+            <h3 class="payment-title">ÖDEME YÖNTEMİ SEÇİN</h3>
+            <div class="payment-methods">
+                <div class="payment-method selected" onclick="selectPaymentMethod('credit')">
+                    <i class="fas fa-credit-card" style="color: #00ff9d;"></i>
+                    <span>Kredi Kartı</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('paypal')">
+                    <i class="fab fa-paypal" style="color: #003087;"></i>
+                    <span>PayPal</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('crypto')">
+                    <i class="fab fa-bitcoin" style="color: #f7931a;"></i>
+                    <span>Kripto</span>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('bank')">
+                    <i class="fas fa-university" style="color: #b0b0b0;"></i>
+                    <span>Havale/EFT</span>
+                </div>
+            </div>
+
+            <div class="payment-details">
+                <div class="payment-row">
+                    <span>Seçilen Paket:</span>
+                    <span id="selectedPackageText">Yıllık VIP</span>
+                </div>
+                <div class="payment-row">
+                    <span>Fiyat:</span>
+                    <span id="selectedPrice">₺999</span>
+                </div>
+                <div class="payment-row">
+                    <span>Kampanya İndirimi:</span>
+                    <span id="discountAmount" style="color: #00ff9d;">₺0</span>
+                </div>
+                <div class="payment-row">
+                    <span>KDV (%18):</span>
+                    <span id="taxAmount">₺179.82</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-total">Toplam:</span>
+                    <span class="payment-total" id="totalAmount">₺1,178.82</span>
+                </div>
+            </div>
+
+            <button class="btn-pay" onclick="processPayment()">
+                <i class="fas fa-lock"></i> GÜVENLİ ÖDEME YAP
+            </button>
+            <p style="text-align: center; margin-top: 1rem; color: #6a7a8a; font-size: 0.8rem;">
+                <i class="fas fa-shield-alt"></i> 256-bit SSL ile güvenli ödeme
+            </p>
+        </div>
+
+        <!-- VIP Makineler Önizleme -->
+        <div class="preview-section">
+            <h2 class="section-title">VIP MAKİNELERDEN BAZILARI</h2>
+            <div class="machines-preview">
+                <div class="machine-card">
+                    <div class="lock-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="machine-content">
+                        <div class="machine-header">
+                            <span class="machine-name">HACKLAB-VIP-01</span>
+                            <span class="machine-difficulty difficulty-expert">Uzman</span>
+                        </div>
+                        <div class="machine-points">
+                            <i class="fas fa-star"></i> 750 puan
+                        </div>
+                        <div class="machine-tags">
+                            <span class="tag">#advanced</span>
+                            <span class="tag">#reverse</span>
+                            <span class="tag">#exploit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="machine-card">
+                    <div class="lock-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="machine-content">
+                        <div class="machine-header">
+                            <span class="machine-name">HACKLAB-VIP-02</span>
+                            <span class="machine-difficulty difficulty-expert">Uzman</span>
+                        </div>
+                        <div class="machine-points">
+                            <i class="fas fa-star"></i> 800 puan
+                        </div>
+                        <div class="machine-tags">
+                            <span class="tag">#crypto</span>
+                            <span class="tag">#math</span>
+                            <span class="tag">#rsa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="machine-card">
+                    <div class="lock-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="machine-content">
+                        <div class="machine-header">
+                            <span class="machine-name">HACKLAB-VIP-03</span>
+                            <span class="machine-difficulty difficulty-expert">Uzman</span>
+                        </div>
+                        <div class="machine-points">
+                            <i class="fas fa-star"></i> 900 puan
+                        </div>
+                        <div class="machine-tags">
+                            <span class="tag">#forensics</span>
+                            <span class="tag">#memory</span>
+                            <span class="tag">#analysis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kullanıcı Yorumları -->
+        <div class="testimonials-section">
+            <h2 class="section-title">VIP ÜYELERİMİZ NE DİYOR?</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <img src="https://www.gravatar.com/avatar/11111111111111111111111111111111?d=mp&f=y" alt="@root_hunter">
+                    </div>
+                    <div class="testimonial-name">@root_hunter</div>
+                    <div class="testimonial-role">VIP Üye • 1 yıl</div>
+                    <div class="testimonial-text">
+                        "VIP makineler gerçekten zorlayıcı! Çift puan sayesinde leaderboard'da hızla yükseldim. Kesinlikle değer."
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <img src="https://www.gravatar.com/avatar/33333333333333333333333333333333?d=mp&f=y" alt="@byte_bender">
+                    </div>
+                    <div class="testimonial-name">@byte_bender</div>
+                    <div class="testimonial-role">VIP Üye • 6 ay</div>
+                    <div class="testimonial-text">
+                        "Özel Discord kanalı harika! Diğer VIP üyelerle fikir alışverişi yapmak çok değerli."
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <img src="https://www.gravatar.com/avatar/44444444444444444444444444444444?d=mp&f=y" alt="@payload_master">
+                    </div>
+                    <div class="testimonial-name">@payload_master</div>
+                    <div class="testimonial-role">VIP Üye • 2 yıl</div>
+                    <div class="testimonial-text">
+                        "Öncelikli destek mükemmel çalışıyor. Sorun yaşadığımda çok hızlı çözüm alıyorum."
+                    </div>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SSS -->
+        <div class="faq-section">
+            <h2 class="section-title">SIKÇA SORULAN SORULAR</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        VIP üyelik nasıl aktif olur?
+                    </div>
+                    <div class="faq-answer">
+                        Ödeme tamamlandıktan sonra VIP üyeliğiniz otomatik olarak aktif olur. Genellikle 1-2 dakika içinde hesabınıza yansır.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        İptal edebilir miyim?
+                    </div>
+                    <div class="faq-answer">
+                        Evet, istediğiniz zaman iptal edebilirsiniz. Aylık üyeliklerde iptalden sonraki ay yenileme yapılmaz. Yıllık üyeliklerde iade yapılmaz.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        Hangi ödeme yöntemleri geçerli?
+                    </div>
+                    <div class="faq-answer">
+                        Kredi kartı (Visa, Mastercard), PayPal, kripto para (Bitcoin, Ethereum) ve banka havalesi ile ödeme yapabilirsiniz.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle"></i>
+                        Kampanya kodları birleştirilebilir mi?
+                    </div>
+                    <div class="faq-answer">
+                        Hayır, kampanya kodları diğer indirimlerle birleştirilemez. En avantajlı olan otomatik uygulanır.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Ödeme Başarılı Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle" style="color: #00ff9d;"></i> ÖDEME BAŞARILI</h3>
+                <button class="modal-close" onclick="closeSuccessModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; margin-bottom: 1rem;">
+                    <i class="fas fa-crown" style="font-size: 4rem; color: #ffd700;"></i>
+                </p>
+                <p style="text-align: center; color: #b0b0b0;">
+                    Tebrikler! Artık VIP üyesisiniz. Tüm ayrıcalıkları kullanmaya hemen başlayabilirsiniz.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-primary" onclick="goToMachines()">
+                    <i class="fas fa-rocket"></i> MAKİNELERE GİT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            checkVIPStatus();
+            updatePaymentSummary();
+        });
+
+        let selectedPackage = 'yearly';
+        let selectedPayment = 'credit';
+        let campaignDiscount = 0;
+
+        // VIP durumu kontrolü
+        function checkVIPStatus() {
+            const isVIP = true; // Mock - gerçek uygulamada API'den kontrol edilecek
+            
+            if (!isVIP) {
+                document.getElementById('currentVIP').style.display = 'none';
+            } else {
+                startVIPTimer();
+            }
+        }
+
+        // VIP süre sayacı
+        function startVIPTimer() {
+            let days = 15;
+            let hours = 7;
+            
+            setInterval(() => {
+                if (hours === 0) {
+                    if (days === 0) {
+                        // Süre bitti
+                    } else {
+                        days--;
+                        hours = 23;
+                    }
+                } else {
+                    hours--;
+                }
+                
+                document.getElementById('vipTimer').innerHTML = `${days} gün ${hours} saat`;
+            }, 3600000); // Her saat güncelle
+        }
+
+        // Paket seçimi
+        function selectPackage(pkg) {
+            selectedPackage = pkg;
+            
+            // Buton stillerini güncelle
+            document.querySelectorAll('.btn-select').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.textContent = 'SEÇ';
+            });
+            
+            if (pkg === 'monthly') {
+                document.getElementById('btn-monthly').classList.add('selected');
+                document.getElementById('btn-monthly').textContent = 'SEÇİLDİ';
+                document.getElementById('selectedPackageText').textContent = 'Aylık VIP';
+                document.getElementById('selectedPrice').textContent = '₺99';
+            } else if (pkg === 'yearly') {
+                document.getElementById('btn-yearly').classList.add('selected');
+                document.getElementById('btn-yearly').textContent = 'SEÇİLDİ';
+                document.getElementById('selectedPackageText').textContent = 'Yıllık VIP';
+                document.getElementById('selectedPrice').textContent = '₺999';
+            } else if (pkg === 'lifetime') {
+                document.getElementById('btn-lifetime').classList.add('selected');
+                document.getElementById('btn-lifetime').textContent = 'SEÇİLDİ';
+                document.getElementById('selectedPackageText').textContent = 'Ömür Boyu VIP';
+                document.getElementById('selectedPrice').textContent = '₺2,999';
+            }
+            
+            updatePaymentSummary();
+        }
+
+        // Ödeme yöntemi seçimi
+        function selectPaymentMethod(method) {
+            selectedPayment = method;
+            
+            document.querySelectorAll('.payment-method').forEach(m => {
+                m.classList.remove('selected');
+            });
+            
+            event.target.closest('.payment-method').classList.add('selected');
+        }
+
+        // Ödeme özetini güncelle
+        function updatePaymentSummary() {
+            let basePrice = 0;
+            
+            if (selectedPackage === 'monthly') basePrice = 99;
+            else if (selectedPackage === 'yearly') basePrice = 999;
+            else if (selectedPackage === 'lifetime') basePrice = 2999;
+            
+            const discountedPrice = basePrice - campaignDiscount;
+            const tax = discountedPrice * 0.18;
+            const total = discountedPrice + tax;
+            
+            document.getElementById('discountAmount').textContent = `₺${campaignDiscount}`;
+            document.getElementById('taxAmount').textContent = `₺${tax.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `₺${total.toFixed(2)}`;
+        }
+
+        // Kampanya kodu uygula
+        function applyCampaign() {
+            const code = document.getElementById('campaignCode').value;
+            const message = document.getElementById('campaignMessage');
+            
+            // Mock kampanya kodları
+            if (code === 'VIP20') {
+                campaignDiscount = 200;
+                message.style.color = '#00ff9d';
+                message.textContent = '✅ %20 indirim uygulandı!';
+            } else if (code === 'WELCOME10') {
+                campaignDiscount = 100;
+                message.style.color = '#00ff9d';
+                message.textContent = '✅ %10 indirim uygulandı!';
+            } else if (code === 'HACKLAB') {
+                campaignDiscount = 50;
+                message.style.color = '#00ff9d';
+                message.textContent = '✅ ₺50 indirim uygulandı!';
+            } else {
+                campaignDiscount = 0;
+                message.style.color = '#ff5f56';
+                message.textContent = '❌ Geçersiz kampanya kodu!';
+            }
+            
+            updatePaymentSummary();
+        }
+
+        // Ödeme işlemi
+        function processPayment() {
+            // Mock ödeme işlemi
+            const modal = document.getElementById('successModal');
+            modal.classList.add('show');
+        }
+
+        // VIP yenileme
+        function renewVIP() {
+            window.scrollTo({
+                top: document.querySelector('.pricing-section').offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+
+        // Modal kapatma
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
+        }
+
+        // Makinelere git
+        function goToMachines() {
+            window.location.href = '/machines';
+        }
+
+        // Sayfa dışı tıklamalarda modal kapatma
+        window.onclick = function(event) {
+            const modal = document.getElementById('successModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

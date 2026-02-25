@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01010011 01100101 01110100 01110100 01101001 01101110 01100111 01110011 00100000 01000011 01010100 01000110 00100000 01010000 01101100 01100001 01110100 01100110 01101111 01110010 01101101";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .user-points {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            color: #00ff9d;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        .breadcrumb a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00ff9d;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+            color: #2a3a4a;
+        }
+
+        /* Header */
+        .settings-header {
+            margin-bottom: 3rem;
+        }
+
+        .settings-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.5rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-title::before {
+            content: '[';
+            margin-right: 10px;
+            color: #00ff9d;
+        }
+
+        .settings-title::after {
+            content: ']';
+            margin-left: 10px;
+            color: #00ff9d;
+        }
+
+        .settings-subtitle {
+            color: #b0b0b0;
+            font-size: 1rem;
+        }
+
+        /* Ana İçerik Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sol Panel - Menü */
+        .settings-menu {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .menu-header {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .menu-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 1rem 1.5rem;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(0, 255, 157, 0.05);
+            color: #00ff9d;
+        }
+
+        .menu-item.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            border-left-color: #00ff9d;
+        }
+
+        .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .menu-item span {
+            flex: 1;
+        }
+
+        .menu-badge {
+            background: #ff5f56;
+            color: #fff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        /* Sağ Panel - İçerik */
+        .settings-content {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .section-header h2 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .section-header p {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        /* Form Grupları */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-label i {
+            color: #00ff9d;
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00ff9d;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+        }
+
+        .form-control:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236a7a8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px;
+        }
+
+        /* Avatar Yükleme */
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .current-avatar {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #00ff9d;
+            overflow: hidden;
+        }
+
+        .current-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .current-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-overlay i {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .avatar-info h4 {
+            color: #e0e0e0;
+            margin-bottom: 0.3rem;
+        }
+
+        .avatar-info p {
+            color: #6a7a8a;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-upload {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-upload:hover {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        /* İki Faktörlü Doğrulama */
+        .two-factor-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .two-factor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .two-factor-title {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .two-factor-status {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-enabled {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+        }
+
+        .status-disabled {
+            background: rgba(255, 95, 86, 0.2);
+            color: #ff5f56;
+        }
+
+        .two-factor-desc {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Session Listesi */
+        .sessions-list {
+            margin-top: 1rem;
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff9d;
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-device {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .session-meta {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        .session-current {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: #00ff9d;
+        }
+
+        .session-current .session-icon {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .btn-terminate {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid #ff5f56;
+            border-radius: 5px;
+            color: #ff5f56;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-terminate:hover {
+            background: #ff5f56;
+            color: #fff;
+        }
+
+        /* Bildirim Ayarları */
+        .notification-group {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .notification-info p {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2a3a4a;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #e0e0e0;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #00ff9d;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #0a0f0f;
+        }
+
+        /* Tema Seçenekleri */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .theme-option {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .theme-option:hover {
+            border-color: #00ff9d;
+        }
+
+        .theme-option.selected {
+            border-color: #00ff9d;
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .theme-icon {
+            font-size: 2rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .theme-preview {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        /* API Token */
+        .api-token-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .token-display {
+            font-family: 'Share Tech Mono', monospace;
+            background: #0a0f0f;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            color: #00ff9d;
+            word-break: break-all;
+        }
+
+        .token-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-token {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-token:hover {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .btn-token-danger {
+            border-color: #ff5f56;
+            color: #ff5f56;
+        }
+
+        .btn-token-danger:hover {
+            background: #ff5f56;
+            color: #fff;
+        }
+
+        /* Butonlar */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #2a3a4a;
+        }
+
+        .btn-primary {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 8px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #00ff9d;
+            color: #00ff9d;
+        }
+
+        .btn-danger {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: 1px solid #ff5f56;
+            border-radius: 8px;
+            color: #ff5f56;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #ff5f56;
+            color: #fff;
+        }
+
+        /* Uyarı Mesajları */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+        }
+
+        .alert-warning {
+            background: rgba(255, 189, 46, 0.1);
+            border: 1px solid #ffbd2e;
+            color: #ffbd2e;
+        }
+
+        .alert-danger {
+            background: rgba(255, 95, 86, 0.1);
+            border: 1px solid #ff5f56;
+            color: #ff5f56;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1f2f;
+            border: 1px solid #00ff9d;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff5f56;
+        }
+
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-menu {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .avatar-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .theme-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .token-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span class="user-points">👑 1,250 Puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="window.location.href='/dashboard'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Ana Sayfa</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/dashboard">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <span style="color: #00ff9d;">Ayarlar</span>
+        </div>
+
+        <!-- Header -->
+        <div class="settings-header">
+            <h1 class="settings-title">AYARLAR</h1>
+            <p class="settings-subtitle">Hesap ayarlarınızı düzenleyin, güvenlik seçeneklerini yapılandırın</p>
+        </div>
+
+        <!-- Ana İçerik Grid -->
+        <div class="settings-grid">
+            <!-- Sol Panel - Menü -->
+            <div class="settings-menu">
+                <div class="menu-header">
+                    <h3><i class="fas fa-cog"></i> AYARLAR</h3>
+                </div>
+                <ul class="menu-items">
+                    <li class="menu-item active" onclick="switchSettings('profile')">
+                        <i class="fas fa-user"></i>
+                        <span>Profil Bilgileri</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('security')">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Güvenlik</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('notifications')">
+                        <i class="fas fa-bell"></i>
+                        <span>Bildirimler</span>
+                        <span class="menu-badge">3</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('privacy')">
+                        <i class="fas fa-lock"></i>
+                        <span>Gizlilik</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('appearance')">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Görünüm</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('api')">
+                        <i class="fas fa-code"></i>
+                        <span>API & Entegrasyon</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('sessions')">
+                        <i class="fas fa-history"></i>
+                        <span>Oturumlar</span>
+                    </li>
+                    <li class="menu-item" onclick="switchSettings('danger')">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Tehlikeli Bölge</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sağ Panel - İçerik -->
+            <div class="settings-content">
+                <!-- Profil Bilgileri -->
+                <div class="settings-section active" id="profile">
+                    <div class="section-header">
+                        <h2>Profil Bilgileri</h2>
+                        <p>Kişisel bilgilerinizi düzenleyin</p>
+                    </div>
+
+                    <!-- Avatar Yükleme -->
+                    <div class="avatar-upload">
+                        <div class="current-avatar">
+                            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar">
+                            <div class="avatar-overlay" onclick="changeAvatar()">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                        <div class="avatar-info">
+                            <h4>Profil Fotoğrafı</h4>
+                            <p>JPG, PNG veya GIF. Maksimum 2MB.</p>
+                            <button class="btn-upload" onclick="changeAvatar()">
+                                <i class="fas fa-upload"></i> Yeni Fotoğraf Yükle
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user"></i> Ad Soyad
+                                </label>
+                                <input type="text" class="form-control" id="fullName" value="Ahmet Yılmaz">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-at"></i> Kullanıcı Adı
+                                </label>
+                                <input type="text" class="form-control" id="username" value="@cyber_ghost" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-envelope"></i> E-posta Adresi
+                                </label>
+                                <input type="email" class="form-control" id="email" value="ahmet@cyberghost.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i> Telefon
+                                </label>
+                                <input type="tel" class="form-control" id="phone" value="+90 555 123 4567">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Konum
+                            </label>
+                            <input type="text" class="form-control" id="location" value="İstanbul, Türkiye">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-globe"></i> Website
+                            </label>
+                            <input type="url" class="form-control" id="website" value="https://cyberghost.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i> Biyografi
+                            </label>
+                            <textarea class="form-control" id="bio">Merhaba! 5+ yıllık güvenlik araştırmacısıyım. Web güvenliği, reverse engineering ve binary exploitation alanlarında uzmanım. CTF yarışmalarında takım kaptanlığı yapıyorum.</textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="cancelEdit()">İptal</button>
+                            <button type="submit" class="btn-primary" onclick="saveProfile(event)">Değişiklikleri Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Güvenlik -->
+                <div class="settings-section" id="security">
+                    <div class="section-header">
+                        <h2>Güvenlik Ayarları</h2>
+                        <p>Hesap güvenliğinizi yönetin</p>
+                    </div>
+
+                    <!-- Şifre Değiştir -->
+                    <div class="two-factor-box">
+                        <h3 style="color: #00ff9d; margin-bottom: 1rem;">Şifre Değiştir</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Mevcut Şifre</label>
+                            <input type="password" class="form-control" id="currentPassword">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Yeni Şifre</label>
+                                <input type="password" class="form-control" id="newPassword">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Yeni Şifre (Tekrar)</label>
+                                <input type="password" class="form-control" id="confirmPassword">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <button class="btn-primary" onclick="changePassword()">
+                                <i class="fas fa-key"></i> Şifreyi Güncelle
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- İki Faktörlü Doğrulama -->
+                    <div class="two-factor-box">
+                        <div class="two-factor-header">
+                            <span class="two-factor-title">İki Faktörlü Doğrulama (2FA)</span>
+                            <span class="two-factor-status status-disabled">Devre Dışı</span>
+                        </div>
+                        <p class="two-factor-desc">
+                            Hesabınıza ekstra güvenlik katmanı ekleyin. Giriş yaparken telefonunuza gönderilen kodu girmeniz gerekecek.
+                        </p>
+                        <button class="btn-primary" onclick="enable2FA()">
+                            <i class="fas fa-qrcode"></i> 2FA'yı Etkinleştir
+                        </button>
+                    </div>
+
+                    <!-- Oturum Açma Geçmişi -->
+                    <div class="two-factor-box">
+                        <h3 style="color: #00ff9d; margin-bottom: 1rem;">Son Oturum Açmalar</h3>
+                        <div class="sessions-list">
+                            <div class="session-item session-current">
+                                <div class="session-icon">
+                                    <i class="fas fa-laptop"></i>
+                                </div>
+                                <div class="session-info">
+                                    <div class="session-device">Chrome / Windows - İstanbul, TR</div>
+                                    <div class="session-meta">Şu anki oturum • IP: 192.168.1.100</div>
+                                </div>
+                            </div>
+                            <div class="session-item">
+                                <div class="session-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="session-info">
+                                    <div class="session-device">Safari / iOS - Ankara, TR</div>
+                                    <div class="session-meta">2 saat önce • IP: 10.0.0.50</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bildirimler -->
+                <div class="settings-section" id="notifications">
+                    <div class="section-header">
+                        <h2>Bildirim Ayarları</h2>
+                        <p>Hangi bildirimleri almak istediğinizi seçin</p>
+                    </div>
+
+                    <div class="notification-group">
+                        <h4 style="color: #00ff9d; margin-bottom: 1rem;">E-posta Bildirimleri</h4>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Yeni Makine Eklendiğinde</h4>
+                                <p>Platforma yeni makine eklendiğinde bildirim al</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Çözüm Onaylandığında</h4>
+                                <p>Gönderdiğiniz flag onaylandığında bildirim al</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Haftalık Rapor</h4>
+                                <p>Haftalık aktivite raporu ve istatistikler</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="notification-group">
+                        <h4 style="color: #00ff9d; margin-bottom: 1rem;">Tarayıcı Bildirimleri</h4>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Anlık Bildirimler</h4>
+                                <p>Tarayıcı açıkken anlık bildirimler göster</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Sesli Uyarılar</h4>
+                                <p>Bildirim geldiğinde ses çal</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="saveNotifications()">Bildirim Ayarlarını Kaydet</button>
+                    </div>
+                </div>
+
+                <!-- Gizlilik -->
+                <div class="settings-section" id="privacy">
+                    <div class="section-header">
+                        <h2>Gizlilik Ayarları</h2>
+                        <p>Profil gizliliğinizi yönetin</p>
+                    </div>
+
+                    <div class="notification-group">
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Profili Herkese Açık Yap</h4>
+                                <p>Profilinizin herkese açık olarak görüntülenmesine izin ver</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Çözüm Geçmişini Göster</h4>
+                                <p>Çözdüğünüz makinelerin herkese açık olarak görüntülenmesi</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Online Durumunu Göster</h4>
+                                <p>Diğer kullanıcıların sizin online olup olmadığınızı görmesi</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Arama Motorlarında Görün</h4>
+                                <p>Profilinizin arama motorlarında indexlenmesine izin ver</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        Gizlilik ayarlarınızı değiştirmeniz profilinizin görünürlüğünü anında etkiler.
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="savePrivacy()">Gizlilik Ayarlarını Kaydet</button>
+                    </div>
+                </div>
+
+                <!-- Görünüm -->
+                <div class="settings-section" id="appearance">
+                    <div class="section-header">
+                        <h2>Görünüm Ayarları</h2>
+                        <p>Tema ve görünüm tercihlerinizi yapılandırın</p>
+                    </div>
+
+                    <div class="theme-options">
+                        <div class="theme-option selected" onclick="selectTheme('dark')">
+                            <div class="theme-icon">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="theme-name">Koyu Tema</div>
+                            <div class="theme-preview">Varsayılan</div>
+                        </div>
+                        <div class="theme-option" onclick="selectTheme('light')">
+                            <div class="theme-icon">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="theme-name">Açık Tema</div>
+                            <div class="theme-preview">Gündüz modu</div>
+                        </div>
+                        <div class="theme-option" onclick="selectTheme('system')">
+                            <div class="theme-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div class="theme-name">Sistem</div>
+                            <div class="theme-preview">Sistem tercihini takip et</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Yazı Tipi Boyutu</label>
+                        <select class="form-control">
+                            <option>Küçük</option>
+                            <option selected>Orta</option>
+                            <option>Büyük</option>
+                            <option>Çok Büyük</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Animasyon Seviyesi</label>
+                        <select class="form-control">
+                            <option selected>Normal</option>
+                            <option>Azaltılmış</option>
+                            <option>Kapalı</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="saveAppearance()">Görünüm Ayarlarını Kaydet</button>
+                    </div>
+                </div>
+
+                <!-- API & Entegrasyon -->
+                <div class="settings-section" id="api">
+                    <div class="section-header">
+                        <h2>API & Entegrasyon</h2>
+                        <p>API anahtarlarınızı ve entegrasyonlarınızı yönetin</p>
+                    </div>
+
+                    <div class="api-token-box">
+                        <h4 style="color: #00ff9d; margin-bottom: 1rem;">API Erişim Token'ı</h4>
+                        <div class="token-display" id="apiToken">
+                            hlab_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                        </div>
+                        <div class="token-actions">
+                            <button class="btn-token" onclick="copyToken()">
+                                <i class="fas fa-copy"></i> Kopyala
+                            </button>
+                            <button class="btn-token" onclick="regenerateToken()">
+                                <i class="fas fa-sync-alt"></i> Yeniden Oluştur
+                            </button>
+                            <button class="btn-token btn-token-danger" onclick="revokeToken()">
+                                <i class="fas fa-ban"></i> İptal Et
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-group">
+                        <h4 style="color: #00ff9d; margin-bottom: 1rem;">Discord Entegrasyonu</h4>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Discord'a Bağla</h4>
+                                <p>Çözümlerinizi Discord'da paylaşın</p>
+                            </div>
+                            <button class="btn-secondary" onclick="connectDiscord()">
+                                <i class="fab fa-discord"></i> Bağlan
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-group">
+                        <h4 style="color: #00ff9d; margin-bottom: 1rem;">GitHub Entegrasyonu</h4>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>GitHub'a Bağla</h4>
+                                <p>Çözümlerinizi GitHub'da paylaşın</p>
+                            </div>
+                            <button class="btn-secondary" onclick="connectGithub()">
+                                <i class="fab fa-github"></i> Bağlan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oturumlar -->
+                <div class="settings-section" id="sessions">
+                    <div class="section-header">
+                        <h2>Aktif Oturumlar</h2>
+                        <p>Tüm aktif oturumlarınızı görüntüleyin ve yönetin</p>
+                    </div>
+
+                    <div class="sessions-list">
+                        <div class="session-item session-current">
+                            <div class="session-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div class="session-info">
+                                <div class="session-device">Chrome / Windows - İstanbul, TR</div>
+                                <div class="session-meta">Şu anki oturum • IP: 192.168.1.100</div>
+                            </div>
+                            <div>
+                                <span style="color: #00ff9d; font-size: 0.8rem;">Aktif</span>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="session-info">
+                                <div class="session-device">Safari / iOS - Ankara, TR</div>
+                                <div class="session-meta">Son aktivite: 2 saat önce • IP: 10.0.0.50</div>
+                            </div>
+                            <button class="btn-terminate" onclick="terminateSession(1)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="session-info">
+                                <div class="session-device">Firefox / Linux - London, UK</div>
+                                <div class="session-meta">Son aktivite: 1 gün önce • IP: 85.255.1.1</div>
+                            </div>
+                            <button class="btn-terminate" onclick="terminateSession(2)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-danger" onclick="terminateAllSessions()">
+                            <i class="fas fa-sign-out-alt"></i> Tüm Oturumları Sonlandır
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tehlikeli Bölge -->
+                <div class="settings-section" id="danger">
+                    <div class="section-header">
+                        <h2 style="color: #ff5f56;">Tehlikeli Bölge</h2>
+                        <p>Bu işlemler geri alınamaz, dikkatli olun!</p>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Bu bölümdeki işlemler hesabınızı kalıcı olarak etkileyebilir.
+                    </div>
+
+                    <div class="two-factor-box">
+                        <h3 style="color: #ff5f56; margin-bottom: 1rem;">Hesabı Dondur</h3>
+                        <p class="two-factor-desc">
+                            Hesabınızı geçici olarak dondurun. Dondurulmuş hesaplar tekrar aktifleştirilebilir.
+                        </p>
+                        <button class="btn-danger" onclick="deactivateAccount()">
+                            <i class="fas fa-pause-circle"></i> Hesabı Dondur
+                        </button>
+                    </div>
+
+                    <div class="two-factor-box">
+                        <h3 style="color: #ff5f56; margin-bottom: 1rem;">Hesabı Sil</h3>
+                        <p class="two-factor-desc">
+                            Hesabınızı kalıcı olarak silin. Bu işlem geri alınamaz ve tüm verileriniz kaybolur.
+                        </p>
+                        <button class="btn-danger" onclick="deleteAccount()">
+                            <i class="fas fa-trash-alt"></i> Hesabı Kalıcı Olarak Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle" style="color: #ff5f56;"></i> Onayla</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalMessage">
+                Bu işlemi gerçekleştirmek istediğinize emin misiniz?
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-secondary" onclick="closeModal()">İptal</button>
+                <button class="btn-modal btn-modal-primary" onclick="confirmAction()">Onayla</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAction = null;
+
+        // Menü geçişi
+        function switchSettings(section) {
+            // Menü öğelerini güncelle
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // İçerik bölümlerini güncelle
+            document.querySelectorAll('.settings-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+            
+            // Sayfayı yukarı kaydır
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Profil düzenleme
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            const website = document.getElementById('website').value;
+            const bio = document.getElementById('bio').value;
+            
+            // API çağrısı simülasyonu
+            showMessage('Profil bilgileri güncellendi!', 'success');
+        }
+
+        function cancelEdit() {
+            // Formu sıfırla
+            document.getElementById('profileForm').reset();
+        }
+
+        // Avatar değiştirme
+        function changeAvatar() {
+            // Dosya seçme dialog'u simülasyonu
+            alert('Dosya seçme penceresi açılacak');
+        }
+
+        // Şifre değiştirme
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (!current || !newPass || !confirm) {
+                showMessage('Lütfen tüm alanları doldurun!', 'error');
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                showMessage('Yeni şifreler eşleşmiyor!', 'error');
+                return;
+            }
+            
+            if (newPass.length < 8) {
+                showMessage('Şifre en az 8 karakter olmalı!', 'error');
+                return;
+            }
+            
+            showMessage('Şifre başarıyla değiştirildi!', 'success');
+            
+            // Formu temizle
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        // 2FA
+        function enable2FA() {
+            showMessage('2FA kurulum sayfası açılacak', 'info');
+        }
+
+        // Bildirim ayarları
+        function saveNotifications() {
+            showMessage('Bildirim ayarları kaydedildi!', 'success');
+        }
+
+        // Gizlilik ayarları
+        function savePrivacy() {
+            showMessage('Gizlilik ayarları kaydedildi!', 'success');
+        }
+
+        // Tema seçimi
+        function selectTheme(theme) {
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            showMessage(`Tema değiştirildi: ${theme}`, 'success');
+        }
+
+        // Görünüm ayarları
+        function saveAppearance() {
+            showMessage('Görünüm ayarları kaydedildi!', 'success');
+        }
+
+        // API Token işlemleri
+        function copyToken() {
+            const token = document.getElementById('apiToken').textContent;
+            navigator.clipboard.writeText(token);
+            showMessage('Token kopyalandı!', 'success');
+        }
+
+        function regenerateToken() {
+            showConfirm('Yeni token oluşturulacak. Eski token geçersiz olacak. Devam etmek istiyor musunuz?', () => {
+                document.getElementById('apiToken').textContent = 'hlab_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+                showMessage('Yeni token oluşturuldu!', 'success');
+            });
+        }
+
+        function revokeToken() {
+            showConfirm('Token iptal edilecek. API erişiminiz duracak. Devam etmek istiyor musunuz?', () => {
+                document.getElementById('apiToken').textContent = 'İptal edildi - Yeni token oluşturun';
+                showMessage('Token iptal edildi!', 'warning');
+            });
+        }
+
+        // Entegrasyonlar
+        function connectDiscord() {
+            showMessage('Discord bağlantı sayfası açılacak', 'info');
+        }
+
+        function connectGithub() {
+            showMessage('GitHub bağlantı sayfası açılacak', 'info');
+        }
+
+        // Oturum yönetimi
+        function terminateSession(sessionId) {
+            showConfirm('Bu oturumu sonlandırmak istediğinize emin misiniz?', () => {
+                // Session'ı listeden kaldır
+                event.target.closest('.session-item').remove();
+                showMessage('Oturum sonlandırıldı!', 'success');
+            });
+        }
+
+        function terminateAllSessions() {
+            showConfirm('Tüm oturumlar sonlandırılacak (bu oturum hariç). Devam etmek istiyor musunuz?', () => {
+                // Tüm session'ları temizle
+                document.querySelectorAll('.session-item:not(.session-current)').forEach(item => {
+                    item.remove();
+                });
+                showMessage('Diğer tüm oturumlar sonlandırıldı!', 'success');
+            });
+        }
+
+        // Tehlikeli bölge işlemleri
+        function deactivateAccount() {
+            showConfirm('Hesabınız dondurulacak. Tekrar aktifleştirmek için destek ekibiyle iletişime geçmeniz gerekecek. Devam etmek istiyor musunuz?', () => {
+                showMessage('Hesabınız donduruldu!', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/logout';
+                }, 2000);
+            });
+        }
+
+        function deleteAccount() {
+            showConfirm('HESAP KALICI OLARAK SİLİNECEK! Bu işlem geri alınamaz ve tüm verileriniz kaybolacak. Emin misiniz?', () => {
+                showConfirm('SON UYARI: Hesabınızı silmek istediğinize emin misiniz?', () => {
+                    showMessage('Hesabınız siliniyor...', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/logout';
+                    }, 2000);
+                });
+            });
+        }
+
+        // Modal işlemleri
+        function showConfirm(message, action) {
+            currentAction = action;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            currentAction = null;
+        }
+
+        function confirmAction() {
+            if (currentAction) {
+                currentAction();
+            }
+            closeModal();
+        }
+
+        // Mesaj göster
+        function showMessage(text, type) {
+            // Toast mesajı göster (basit alert şimdilik)
+            alert(text);
+        }
+
+        // Sayfa dışı tıklamalarda modal kapatma
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

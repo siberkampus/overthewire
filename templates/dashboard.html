@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@cyber_ghost - Kullanıcı Profili - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01010000 01110010 01101111 01100110 01101001 01101100 01100101 00100000 01000011 01010100 01000110 00100000 01001000 01100001 01100011 01101011 01100101 01110010";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar-small:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        .breadcrumb a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00ff9d;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+            color: #2a3a4a;
+        }
+
+        /* Profil Header */
+        .profile-header {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 157, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+            pointer-events: none;
+        }
+
+        .profile-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(90deg, #00ff9d20, #00b8ff20);
+            border-bottom: 1px solid #00ff9d;
+        }
+
+        .profile-info {
+            position: relative;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-end;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #00ff9d;
+            box-shadow: 0 0 40px rgba(0, 255, 157, 0.3);
+            background: #1a1f2f;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.5rem;
+            color: #00ff9d;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-vip {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #0a0f0f;
+        }
+
+        .badge-verified {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .badge-pro {
+            background: #00b8ff;
+            color: #0a0f0f;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #b0b0b0;
+        }
+
+        .profile-meta-item i {
+            color: #00ff9d;
+            width: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            color: #00ff9d;
+        }
+
+        .profile-stat-label {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-message {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: 1px solid #00ff9d;
+            border-radius: 5px;
+            color: #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-message:hover {
+            background: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .btn-follow {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-follow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-follow.following {
+            background: transparent;
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+        }
+
+        /* Ana İçerik Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Sol Panel */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Hakkında */
+        .bio {
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list i {
+            width: 20px;
+            color: #00ff9d;
+        }
+
+        /* Yetenekler */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            color: #00ff9d;
+        }
+
+        .skill-level {
+            margin-left: 0.5rem;
+            color: #ffbd2e;
+            font-size: 0.7rem;
+        }
+
+        /* Rozetler */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .achievement-item {
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 0.5rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 2px solid #00ff9d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #00ff9d;
+        }
+
+        .achievement-name {
+            font-size: 0.8rem;
+            color: #e0e0e0;
+            margin-bottom: 0.2rem;
+        }
+
+        .achievement-date {
+            font-size: 0.6rem;
+            color: #6a7a8a;
+        }
+
+        /* Takipçiler */
+        .followers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .follower-item {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .follower-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            margin-bottom: 0.3rem;
+        }
+
+        .follower-name {
+            font-size: 0.7rem;
+            color: #b0b0b0;
+        }
+
+        /* Sağ Panel - Tablar */
+        .right-panel {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #2a3a4a;
+            background: rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: #00ff9d;
+        }
+
+        .tab.active {
+            color: #00ff9d;
+            border-bottom-color: #00ff9d;
+        }
+
+        .tab-content {
+            padding: 2rem;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* İstatistik Kartları */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-card-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: #00ff9d;
+        }
+
+        .stat-card-label {
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        /* Grafik */
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            height: 300px;
+        }
+
+        /* Makine Grid */
+        .machines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .machine-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-3px);
+            border-color: #00ff9d;
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-name {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+        }
+
+        .machine-difficulty {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .difficulty-easy {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 95, 86, 0.2);
+            color: #ff5f56;
+        }
+
+        .machine-points {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-bottom: 0.3rem;
+        }
+
+        .machine-date {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        /* Rozetler Grid */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .badge-card:hover {
+            transform: translateY(-3px);
+            border-color: #00ff9d;
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .badge-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge-desc {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin-top: 1.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid #00ff9d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff9d;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #6a7a8a;
+        }
+
+        .timeline-meta i {
+            color: #00ff9d;
+            margin-right: 0.3rem;
+        }
+
+        /* Sayfalama */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .page-link:hover,
+        .page-link.active {
+            background: #00ff9d;
+            border-color: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 15, 20, 0.95);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid #00ff9d;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section ul li a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #00ff9d;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .profile-meta {
+                justify-content: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .profile-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .profile-username {
+                font-size: 2rem;
+            }
+            
+            .profile-meta {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tabs {
+                justify-content: flex-start;
+            }
+            
+            .tab {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines">Makineler</a>
+            <a href="/leaderboard">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span id="userPoints" style="color: #00ff9d;">👑 1250 puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar-small" onclick="window.location.href='/profile/me'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Ana Sayfa</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/leaderboard">Liderlik</a>
+            <i class="fas fa-chevron-right"></i>
+            <span style="color: #00ff9d;">@cyber_ghost</span>
+        </div>
+
+        <!-- Profil Header -->
+        <div class="profile-header">
+            <div class="profile-cover"></div>
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <img src="https://www.gravatar.com/avatar/22222222222222222222222222222222?d=mp&f=y" alt="@cyber_ghost">
+                </div>
+                <div class="profile-details">
+                    <div class="profile-name">
+                        <h1 class="profile-username">@cyber_ghost</h1>
+                        <div class="profile-badges">
+                            <span class="badge badge-vip">VIP</span>
+                            <span class="badge badge-verified">✓ Doğrulanmış</span>
+                            <span class="badge badge-pro">PRO</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-meta">
+                        <span class="profile-meta-item">
+                            <i class="fas fa-map-marker-alt"></i> İstanbul, Türkiye
+                        </span>
+                        <span class="profile-meta-item">
+                            <i class="fas fa-calendar"></i> Katılma: 15 Ocak 2023
+                        </span>
+                        <span class="profile-meta-item">
+                            <i class="fas fa-globe"></i> cyberghost.com
+                        </span>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">1,542</div>
+                            <div class="profile-stat-label">Toplam Puan</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">156</div>
+                            <div class="profile-stat-label">Çözülen Makine</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">98%</div>
+                            <div class="profile-stat-label">Başarı</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">#1</div>
+                            <div class="profile-stat-label">Sıralama</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button class="btn-message" onclick="sendMessage()">
+                            <i class="fas fa-envelope"></i> Mesaj Gönder
+                        </button>
+                        <button class="btn-follow" id="followBtn" onclick="toggleFollow()">
+                            <i class="fas fa-user-plus"></i> Takip Et
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ana İçerik Grid -->
+        <div class="content-grid">
+            <!-- Sol Panel -->
+            <div class="left-panel">
+                <!-- Hakkında -->
+                <div class="info-card">
+                    <div class="card-title">
+                        <i class="fas fa-user"></i> HAKKINDA
+                    </div>
+                    <p class="bio">
+                        Merhaba! 5+ yıllık güvenlik araştırmacısıyım. Web güvenliği, reverse engineering ve binary exploitation alanlarında uzmanım. CTF yarışmalarında takım kaptanlığı yapıyorum.
+                    </p>
+                    <ul class="info-list">
+                        <li>
+                            <i class="fas fa-briefcase"></i>
+                            <span>Kıdemli Güvenlik Araştırmacısı @ HackCorp</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Bilgisayar Mühendisliği - İTÜ</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-trophy"></i>
+                            <span>DEFCON 28 Finalisti</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-language"></i>
+                            <span>Türkçe, İngilizce, Rusça</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Yetenekler -->
+                <div class="info-card">
+                    <div class="card-title">
+                        <i class="fas fa-code"></i> YETENEKLER
+                    </div>
+                    <div class="skills-container">
+                        <span class="skill-tag">Web Güvenliği <span class="skill-level">★★★★★</span></span>
+                        <span class="skill-tag">Reverse Engineering <span class="skill-level">★★★★☆</span></span>
+                        <span class="skill-tag">Binary Exploitation <span class="skill-level">★★★★☆</span></span>
+                        <span class="skill-tag">Network Pentest <span class="skill-level">★★★☆☆</span></span>
+                        <span class="skill-tag">Kriptografi <span class="skill-level">★★★☆☆</span></span>
+                        <span class="skill-tag">Forensics <span class="skill-level">★★☆☆☆</span></span>
+                    </div>
+                </div>
+
+                <!-- Rozetler -->
+                <div class="info-card">
+                    <div class="card-title">
+                        <i class="fas fa-medal"></i> KAZANILAN ROZETLER
+                    </div>
+                    <div class="achievements-grid">
+                        <div class="achievement-item" onclick="showAchievement('first-blood')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="achievement-name">First Blood</div>
+                            <div class="achievement-date">10 makinede ilk çözüm</div>
+                        </div>
+                        <div class="achievement-item" onclick="showAchievement('veteran')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-skull"></i>
+                            </div>
+                            <div class="achievement-name">Veteran</div>
+                            <div class="achievement-date">100+ makine çözümü</div>
+                        </div>
+                        <div class="achievement-item" onclick="showAchievement('perfect')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="achievement-name">Perfect</div>
+                            <div class="achievement-date">%100 başarı oranı</div>
+                        </div>
+                        <div class="achievement-item" onclick="showAchievement('speed')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="achievement-name">Speed Demon</div>
+                            <div class="achievement-date">1 saatte 5 çözüm</div>
+                        </div>
+                        <div class="achievement-item" onclick="showAchievement('mentor')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="achievement-name">Mentor</div>
+                            <div class="achievement-date">10+ kullanıcıya yardım</div>
+                        </div>
+                        <div class="achievement-item" onclick="showAchievement('vip')">
+                            <div class="achievement-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="achievement-name">Elite</div>
+                            <div class="achievement-date">1 yıl VIP üyelik</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Takipçiler -->
+                <div class="info-card">
+                    <div class="card-title">
+                        <i class="fas fa-users"></i> TAKİPÇİLER (1.2K)
+                    </div>
+                    <div class="followers-grid">
+                        <div class="follower-item" onclick="viewProfile('root_hunter')">
+                            <img src="https://www.gravatar.com/avatar/11111111111111111111111111111111?d=mp&f=y" alt="@root_hunter" class="follower-avatar">
+                            <div class="follower-name">@root_hunter</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('byte_bender')">
+                            <img src="https://www.gravatar.com/avatar/33333333333333333333333333333333?d=mp&f=y" alt="@byte_bender" class="follower-avatar">
+                            <div class="follower-name">@byte_bender</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('payload_master')">
+                            <img src="https://www.gravatar.com/avatar/44444444444444444444444444444444?d=mp&f=y" alt="@payload_master" class="follower-avatar">
+                            <div class="follower-name">@payload_master</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('shell_shocker')">
+                            <img src="https://www.gravatar.com/avatar/55555555555555555555555555555555?d=mp&f=y" alt="@shell_shocker" class="follower-avatar">
+                            <div class="follower-name">@shell_shocker</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('binary_breaker')">
+                            <img src="https://www.gravatar.com/avatar/66666666666666666666666666666666?d=mp&f=y" alt="@binary_breaker" class="follower-avatar">
+                            <div class="follower-name">@binary_breaker</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('null_pointer')">
+                            <img src="https://www.gravatar.com/avatar/77777777777777777777777777777777?d=mp&f=y" alt="@null_pointer" class="follower-avatar">
+                            <div class="follower-name">@null_pointer</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('stack_smasher')">
+                            <img src="https://www.gravatar.com/avatar/88888888888888888888888888888888?d=mp&f=y" alt="@stack_smasher" class="follower-avatar">
+                            <div class="follower-name">@stack_smasher</div>
+                        </div>
+                        <div class="follower-item" onclick="viewProfile('hex_hacker')">
+                            <img src="https://www.gravatar.com/avatar/99999999999999999999999999999999?d=mp&f=y" alt="@hex_hacker" class="follower-avatar">
+                            <div class="follower-name">@hex_hacker</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel - Tablar -->
+            <div class="right-panel">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('overview')">Genel Bakış</div>
+                    <div class="tab" onclick="switchTab('machines')">Çözülen Makineler</div>
+                    <div class="tab" onclick="switchTab('badges')">Rozetler</div>
+                    <div class="tab" onclick="switchTab('activity')">Aktivite</div>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Genel Bakış Tab -->
+                    <div class="tab-pane active" id="overview">
+                        <!-- Hızlı İstatistikler -->
+                        <div class="stats-overview">
+                            <div class="stat-card">
+                                <div class="stat-card-value">156</div>
+                                <div class="stat-card-label">Çözülen Makine</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-value">47</div>
+                                <div class="stat-card-label">VIP Makine</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-value">12</div>
+                                <div class="stat-card-label">First Blood</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-value">3</div>
+                                <div class="stat-card-label">Yazdığı Makine</div>
+                            </div>
+                        </div>
+
+                        <!-- Grafik -->
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+
+                        <!-- Zorluk Dağılımı -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #00ff9d; margin-bottom: 1rem; font-family: 'Share Tech Mono';">
+                                <i class="fas fa-chart-pie"></i> Zorluk Dağılımı
+                            </h3>
+                            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: #00ff9d;">Kolay</span>
+                                        <span>78 makine</span>
+                                    </div>
+                                    <div style="height: 8px; background: #2a3a4a; border-radius: 4px;">
+                                        <div style="width: 50%; height: 100%; background: #00ff9d; border-radius: 4px;"></div>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; margin: 1rem 0 0.5rem;">
+                                        <span style="color: #ffbd2e;">Orta</span>
+                                        <span>52 makine</span>
+                                    </div>
+                                    <div style="height: 8px; background: #2a3a4a; border-radius: 4px;">
+                                        <div style="width: 33%; height: 100%; background: #ffbd2e; border-radius: 4px;"></div>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; margin: 1rem 0 0.5rem;">
+                                        <span style="color: #ff5f56;">Zor</span>
+                                        <span>26 makine</span>
+                                    </div>
+                                    <div style="height: 8px; background: #2a3a4a; border-radius: 4px;">
+                                        <div style="width: 17%; height: 100%; background: #ff5f56; border-radius: 4px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Çözülen Makineler Tab -->
+                    <div class="tab-pane" id="machines">
+                        <div class="machines-grid" id="solvedMachines">
+                            <!-- JavaScript ile doldurulacak -->
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <ul class="pagination" id="machinesPagination"></ul>
+                    </div>
+
+                    <!-- Rozetler Tab -->
+                    <div class="tab-pane" id="badges">
+                        <div class="badges-grid" id="badgesGrid">
+                            <!-- JavaScript ile doldurulacak -->
+                        </div>
+                    </div>
+
+                    <!-- Aktivite Tab -->
+                    <div class="tab-pane" id="activity">
+                        <div class="timeline" id="activityTimeline">
+                            <!-- JavaScript ile doldurulacak -->
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <ul class="pagination" id="activityPagination"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // URL'den kullanıcı adını al
+        const username = window.location.pathname.split('/').pop();
+        
+        // Mock kullanıcı verisi
+        const userData = {
+            username: "@cyber_ghost",
+            name: "Ahmet Yılmaz",
+            avatar: "https://www.gravatar.com/avatar/22222222222222222222222222222222?d=mp&f=y",
+            bio: "Merhaba! 5+ yıllık güvenlik araştırmacısıyım. Web güvenliği, reverse engineering ve binary exploitation alanlarında uzmanım. CTF yarışmalarında takım kaptanlığı yapıyorum.",
+            location: "İstanbul, Türkiye",
+            website: "cyberghost.com",
+            joined: "15 Ocak 2023",
+            points: 1542,
+            solved: 156,
+            accuracy: 98,
+            rank: 1,
+            isVIP: true,
+            isVerified: true,
+            isPro: true,
+            isFollowing: false,
+            followers: 1245,
+            following: 342,
+            skills: {
+                "Web Güvenliği": 5,
+                "Reverse Engineering": 4,
+                "Binary Exploitation": 4,
+                "Network Pentest": 3,
+                "Kriptografi": 3,
+                "Forensics": 2
+            },
+            solvedMachines: [
+                {
+                    id: 1,
+                    name: "HACKLAB-01",
+                    difficulty: "easy",
+                    points: 150,
+                    solvedAt: "2024-01-15",
+                    timeSpent: "45 dakika"
+                },
+                {
+                    id: 2,
+                    name: "HACKLAB-02",
+                    difficulty: "medium",
+                    points: 300,
+                    solvedAt: "2024-01-14",
+                    timeSpent: "2 saat 15 dakika"
+                },
+                {
+                    id: 3,
+                    name: "HACKLAB-03",
+                    difficulty: "hard",
+                    points: 500,
+                    solvedAt: "2024-01-12",
+                    timeSpent: "4 saat 30 dakika"
+                },
+                {
+                    id: 4,
+                    name: "HACKLAB-04",
+                    difficulty: "expert",
+                    points: 750,
+                    solvedAt: "2024-01-10",
+                    timeSpent: "6 saat"
+                },
+                {
+                    id: 5,
+                    name: "HACKLAB-05",
+                    difficulty: "hard",
+                    points: 450,
+                    solvedAt: "2024-01-08",
+                    timeSpent: "3 saat 20 dakika"
+                }
+            ],
+            badges: [
+                {
+                    id: 1,
+                    name: "First Blood",
+                    icon: "fa-tint",
+                    description: "10 makinede ilk çözüm",
+                    earnedAt: "2024-01-15"
+                },
+                {
+                    id: 2,
+                    name: "Veteran",
+                    icon: "fa-skull",
+                    description: "100+ makine çözümü",
+                    earnedAt: "2024-01-10"
+                },
+                {
+                    id: 3,
+                    name: "Perfect",
+                    icon: "fa-star",
+                    description: "%100 başarı oranı",
+                    earnedAt: "2024-01-05"
+                },
+                {
+                    id: 4,
+                    name: "Speed Demon",
+                    icon: "fa-bolt",
+                    description: "1 saatte 5 çözüm",
+                    earnedAt: "2023-12-28"
+                },
+                {
+                    id: 5,
+                    name: "Mentor",
+                    icon: "fa-chalkboard-teacher",
+                    description: "10+ kullanıcıya yardım",
+                    earnedAt: "2023-12-20"
+                },
+                {
+                    id: 6,
+                    name: "Elite",
+                    icon: "fa-crown",
+                    description: "1 yıl VIP üyelik",
+                    earnedAt: "2023-12-15"
+                }
+            ],
+            activity: [
+                {
+                    type: "solve",
+                    machine: "HACKLAB-01",
+                    points: 150,
+                    time: "2 saat önce"
+                },
+                {
+                    type: "badge",
+                    badge: "Speed Demon",
+                    time: "5 saat önce"
+                },
+                {
+                    type: "comment",
+                    machine: "HACKLAB-02",
+                    time: "1 gün önce"
+                },
+                {
+                    type: "solve",
+                    machine: "HACKLAB-03",
+                    points: 500,
+                    time: "2 gün önce"
+                },
+                {
+                    type: "follow",
+                    user: "@new_hacker",
+                    time: "3 gün önce"
+                }
+            ]
+        };
+
+        let currentTab = 'overview';
+        let machinesPage = 1;
+        let activityPage = 1;
+        const itemsPerPage = 5;
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            loadUserData();
+            initChart();
+            renderSolvedMachines();
+            renderBadges();
+            renderActivity();
+            checkFollowStatus();
+        });
+
+        // Kullanıcı verilerini yükle
+        function loadUserData() {
+            document.title = `${userData.username} - Kullanıcı Profili - CTF HACK PLATFORMU`;
+            // Diğer veriler zaten HTML'e gömülü
+        }
+
+        // Chart.js ile grafik
+        function initChart() {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+                    datasets: [{
+                        label: 'Çözülen Makineler',
+                        data: [5, 8, 12, 7, 15, 20, 18],
+                        borderColor: '#00ff9d',
+                        backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#2a3a4a'
+                            },
+                            ticks: {
+                                color: '#b0b0b0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#b0b0b0'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Tab değiştir
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Tab butonlarını güncelle
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // Tab içeriklerini güncelle
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+        }
+
+        // Çözülen makineleri render et
+        function renderSolvedMachines() {
+            const start = (machinesPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageMachines = userData.solvedMachines.slice(start, end);
+            
+            const grid = document.getElementById('solvedMachines');
+            grid.innerHTML = pageMachines.map(machine => `
+                <div class="machine-card" onclick="viewMachine(${machine.id})">
+                    <div class="machine-header">
+                        <span class="machine-name">${machine.name}</span>
+                        <span class="machine-difficulty difficulty-${machine.difficulty}">
+                            ${getDifficultyText(machine.difficulty)}
+                        </span>
+                    </div>
+                    <div class="machine-points">
+                        <i class="fas fa-star"></i> ${machine.points} puan
+                    </div>
+                    <div class="machine-date">
+                        <i class="fas fa-calendar"></i> ${machine.solvedAt}
+                    </div>
+                    <div class="machine-date">
+                        <i class="fas fa-clock"></i> ${machine.timeSpent}
+                    </div>
+                </div>
+            `).join('');
+            
+            renderMachinesPagination();
+        }
+
+        // Makine pagination'ı
+        function renderMachinesPagination() {
+            const totalPages = Math.ceil(userData.solvedMachines.length / itemsPerPage);
+            const pagination = document.getElementById('machinesPagination');
+            
+            let html = '';
+            
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changeMachinesPage(${machinesPage - 1})" ${machinesPage === 1 ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= machinesPage - 2 && i <= machinesPage + 2)) {
+                    html += `
+                        <li class="page-item">
+                            <a class="page-link ${i === machinesPage ? 'active' : ''}" href="#" onclick="changeMachinesPage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === machinesPage - 3 || i === machinesPage + 3) {
+                    html += `<li class="page-dots">...</li>`;
+                }
+            }
+            
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changeMachinesPage(${machinesPage + 1})" ${machinesPage === totalPages ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        function changeMachinesPage(page) {
+            const totalPages = Math.ceil(userData.solvedMachines.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            machinesPage = page;
+            renderSolvedMachines();
+        }
+
+        // Rozetleri render et
+        function renderBadges() {
+            const grid = document.getElementById('badgesGrid');
+            grid.innerHTML = userData.badges.map(badge => `
+                <div class="badge-card">
+                    <div class="badge-icon">
+                        <i class="fas ${badge.icon}"></i>
+                    </div>
+                    <div class="badge-title">${badge.name}</div>
+                    <div class="badge-desc">${badge.description}</div>
+                    <div style="font-size: 0.6rem; color: #6a7a8a; margin-top: 0.5rem;">
+                        <i class="fas fa-calendar"></i> ${badge.earnedAt}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Aktivite timeline'ını render et
+        function renderActivity() {
+            const start = (activityPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageActivity = userData.activity.slice(start, end);
+            
+            const timeline = document.getElementById('activityTimeline');
+            timeline.innerHTML = pageActivity.map(activity => {
+                let icon = 'fa-flag';
+                let title = '';
+                
+                if (activity.type === 'solve') {
+                    icon = 'fa-flag';
+                    title = `${activity.machine} çözüldü - ${activity.points} puan`;
+                } else if (activity.type === 'badge') {
+                    icon = 'fa-medal';
+                    title = `${activity.badge} rozeti kazanıldı`;
+                } else if (activity.type === 'comment') {
+                    icon = 'fa-comment';
+                    title = `${activity.machine} hakkında yorum yapıldı`;
+                } else if (activity.type === 'follow') {
+                    icon = 'fa-user-plus';
+                    title = `${activity.user} takip edildi`;
+                }
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${title}</div>
+                            <div class="timeline-meta">
+                                <span><i class="fas fa-clock"></i> ${activity.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            renderActivityPagination();
+        }
+
+        // Aktivite pagination'ı
+        function renderActivityPagination() {
+            const totalPages = Math.ceil(userData.activity.length / itemsPerPage);
+            const pagination = document.getElementById('activityPagination');
+            
+            let html = '';
+            
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changeActivityPage(${activityPage - 1})" ${activityPage === 1 ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= activityPage - 2 && i <= activityPage + 2)) {
+                    html += `
+                        <li class="page-item">
+                            <a class="page-link ${i === activityPage ? 'active' : ''}" href="#" onclick="changeActivityPage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === activityPage - 3 || i === activityPage + 3) {
+                    html += `<li class="page-dots">...</li>`;
+                }
+            }
+            
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changeActivityPage(${activityPage + 1})" ${activityPage === totalPages ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        function changeActivityPage(page) {
+            const totalPages = Math.ceil(userData.activity.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            activityPage = page;
+            renderActivity();
+        }
+
+        // Yardımcı fonksiyonlar
+        function getDifficultyText(difficulty) {
+            const texts = {
+                'easy': 'Kolay',
+                'medium': 'Orta',
+                'hard': 'Zor',
+                'expert': 'Uzman'
+            };
+            return texts[difficulty] || difficulty;
+        }
+
+        // Takip etme işlemi
+        function toggleFollow() {
+            const btn = document.getElementById('followBtn');
+            const isFollowing = btn.classList.contains('following');
+            
+            if (isFollowing) {
+                btn.classList.remove('following');
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Takip Et';
+                userData.followers--;
+            } else {
+                btn.classList.add('following');
+                btn.innerHTML = '<i class="fas fa-check"></i> Takip Ediliyor';
+                userData.followers++;
+            }
+        }
+
+        function checkFollowStatus() {
+            if (userData.isFollowing) {
+                document.getElementById('followBtn').classList.add('following');
+                document.getElementById('followBtn').innerHTML = '<i class="fas fa-check"></i> Takip Ediliyor';
+            }
+        }
+
+        // Diğer fonksiyonlar
+        function sendMessage() {
+            alert('Mesaj gönderme özelliği yakında!');
+        }
+
+        function viewProfile(username) {
+            window.location.href = `/profile/${username}`;
+        }
+
+        function viewMachine(machineId) {
+            window.location.href = `/machines/${machineId}`;
+        }
+
+        function showAchievement(achievementId) {
+            alert('Rozet detayları yakında!');
+        }
+    </script>
+</body>
+</html>

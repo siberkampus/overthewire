@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liderlik Tablosu - CTF HACK PLATFORMU</title>
+    
+    <!-- Fonts ve Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f0f 0%, #1a1f2f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Matrix efekti */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .matrix-bg::before {
+            content: "01001100 01100101 01100001 01100100 01100101 01110010 01100010 01101111 01100001 01110010 01100100 00100000 01000011 01010100 01000110 00100000 01010010 01100001 01101110 01101011 01101001 01101110 01100111";
+            position: absolute;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff9d;
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff9d, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ff9d;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Ana Container */
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem 5%;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.5rem;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '[';
+            margin-right: 10px;
+            color: #00ff9d;
+        }
+
+        .page-title::after {
+            content: ']';
+            margin-left: 10px;
+            color: #00ff9d;
+        }
+
+        .page-subtitle {
+            color: #b0b0b0;
+            font-size: 1rem;
+        }
+
+        /* Podium */
+        .podium-section {
+            margin-bottom: 3rem;
+        }
+
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .podium-item {
+            text-align: center;
+            position: relative;
+            animation: podiumAppear 0.5s ease-out;
+        }
+
+        @keyframes podiumAppear {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .podium-1 { animation-delay: 0.2s; }
+        .podium-2 { animation-delay: 0.1s; }
+        .podium-3 { animation-delay: 0s; }
+
+        .podium-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .podium-1 .podium-avatar {
+            border-color: #ffd700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .podium-2 .podium-avatar {
+            border-color: #c0c0c0;
+            box-shadow: 0 0 40px rgba(192, 192, 192, 0.3);
+        }
+
+        .podium-3 .podium-avatar {
+            border-color: #cd7f32;
+            box-shadow: 0 0 40px rgba(205, 127, 50, 0.3);
+        }
+
+        .podium-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .podium-crown {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        .podium-1 .podium-crown { color: #ffd700; }
+        .podium-2 .podium-crown { color: #c0c0c0; }
+        .podium-3 .podium-crown { color: #cd7f32; }
+
+        .podium-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .podium-1 .podium-name { color: #ffd700; }
+        .podium-2 .podium-name { color: #c0c0c0; }
+        .podium-3 .podium-name { color: #cd7f32; }
+
+        .podium-points {
+            font-size: 1.1rem;
+            color: #00ff9d;
+        }
+
+        .podium-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        /* Filtreler */
+        .filters-section {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-title {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            position: relative;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.8rem 2rem 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            appearance: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #00ff9d;
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 1rem;
+            bottom: 0.8rem;
+            color: #6a7a8a;
+            pointer-events: none;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-filter {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(45deg, #00ff9d, #00b86e);
+            border: none;
+            border-radius: 5px;
+            color: #0a0f0f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-reset {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-reset:hover {
+            border-color: #ff5f56;
+            color: #ff5f56;
+        }
+
+        /* Leaderboard Tablosu */
+        .leaderboard-section {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .leaderboard-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .leaderboard-stat {
+            text-align: center;
+        }
+
+        .leaderboard-stat-value {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            color: #00ff9d;
+        }
+
+        .leaderboard-stat-label {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .leaderboard-update {
+            color: #6a7a8a;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-update i {
+            color: #00ff9d;
+            margin-right: 0.5rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            color: #00ff9d;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #00ff9d;
+        }
+
+        .leaderboard-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .leaderboard-table tbody tr {
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .rank-cell {
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: 700;
+            width: 60px;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+        .rank-4, .rank-5, .rank-6, .rank-7, .rank-8, .rank-9, .rank-10 { color: #00ff9d; }
+
+        .rank-change {
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .rank-up { color: #00ff9d; }
+        .rank-down { color: #ff5f56; }
+        .rank-same { color: #6a7a8a; }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00ff9d;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .user-badge {
+            font-size: 0.7rem;
+            color: #6a7a8a;
+        }
+
+        .user-badge i {
+            color: #ffd700;
+            margin-right: 0.2rem;
+        }
+
+        .points-cell {
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: 600;
+            color: #00ff9d;
+        }
+
+        .solved-cell {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .accuracy-cell {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .trend-indicator {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+
+        .vip-badge {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #0a0f0f;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Sayfalama */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 5px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .page-link:hover,
+        .page-link.active {
+            background: #00ff9d;
+            border-color: #00ff9d;
+            color: #0a0f0f;
+        }
+
+        .page-dots {
+            color: #6a7a8a;
+            padding: 0 0.5rem;
+        }
+
+        /* İstatistik Kartları */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: rgba(20, 30, 40, 0.8);
+            border: 1px solid #2a3a4a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff9d;
+            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-main {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            color: #e0e0e0;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+        }
+
+        .stat-change.positive {
+            color: #00ff9d;
+        }
+
+        .stat-change.negative {
+            color: #ff5f56;
+        }
+
+        /* Ülke Bayrakları */
+        .country-flag {
+            width: 20px;
+            height: 15px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 15, 20, 0.95);
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid #00ff9d;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section ul li a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #00ff9d;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #b0b0b0;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #00ff9d;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .podium {
+                gap: 1rem;
+            }
+            
+            .podium-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .podium {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .podium-item {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .leaderboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 0.8rem;
+            }
+            
+            .user-cell {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+            
+            .user-avatar-small {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .leaderboard-table th:nth-child(5),
+            .leaderboard-table td:nth-child(5),
+            .leaderboard-table th:nth-child(6),
+            .leaderboard-table td:nth-child(6) {
+                display: none;
+            }
+            
+            .rank-change {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-skull"></i> HACKLAB
+        </div>
+        <div class="nav-links">
+            <a href="/">Ana Sayfa</a>
+            <a href="/machines">Makineler</a>
+            <a href="/leaderboard" class="active">Liderlik</a>
+            <a href="/challenges">Challenge'lar</a>
+            <a href="/forum">Forum</a>
+        </div>
+        <div class="user-menu">
+            <span id="userPoints" style="color: #00ff9d;">👑 1250 puan</span>
+            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="user-avatar" onclick="window.location.href='/profile'">
+        </div>
+    </nav>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">LİDERLİK TABLOSU</h1>
+            <p class="page-subtitle">En iyi hacker'lar ve çözüm istatistikleri</p>
+        </div>
+
+        <!-- Podium -->
+        <div class="podium-section">
+            <div class="podium">
+                <!-- 2. Sıra -->
+                <div class="podium-item podium-2">
+                    <div class="podium-crown">🥈</div>
+                    <div class="podium-avatar">
+                        <img src="https://www.gravatar.com/avatar/11111111111111111111111111111111?d=mp&f=y" alt="@root_hunter">
+                    </div>
+                    <div class="podium-name">@root_hunter</div>
+                    <div class="podium-points">14,890</div>
+                    <div class="podium-stats">
+                        <span><i class="fas fa-flag"></i> 148</span>
+                        <span><i class="fas fa-trophy"></i> 98%</span>
+                    </div>
+                </div>
+
+                <!-- 1. Sıra -->
+                <div class="podium-item podium-1">
+                    <div class="podium-crown">🥇</div>
+                    <div class="podium-avatar">
+                        <img src="https://www.gravatar.com/avatar/22222222222222222222222222222222?d=mp&f=y" alt="@cyber_ghost">
+                    </div>
+                    <div class="podium-name">@cyber_ghost</div>
+                    <div class="podium-points">15,420</div>
+                    <div class="podium-stats">
+                        <span><i class="fas fa-flag"></i> 156</span>
+                        <span><i class="fas fa-trophy"></i> 99%</span>
+                    </div>
+                </div>
+
+                <!-- 3. Sıra -->
+                <div class="podium-item podium-3">
+                    <div class="podium-crown">🥉</div>
+                    <div class="podium-avatar">
+                        <img src="https://www.gravatar.com/avatar/33333333333333333333333333333333?d=mp&f=y" alt="@byte_bender">
+                    </div>
+                    <div class="podium-name">@byte_bender</div>
+                    <div class="podium-points">14,210</div>
+                    <div class="podium-stats">
+                        <span><i class="fas fa-flag"></i> 142</span>
+                        <span><i class="fas fa-trophy"></i> 95%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtreler -->
+        <div class="filters-section">
+            <div class="filters-title">
+                <i class="fas fa-filter"></i> FİLTRELE
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Zaman Aralığı</label>
+                    <select class="filter-select" id="timeFilter">
+                        <option value="all">Tüm Zamanlar</option>
+                        <option value="year">Bu Yıl</option>
+                        <option value="month">Bu Ay</option>
+                        <option value="week">Bu Hafta</option>
+                        <option value="today">Bugün</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Ülke</label>
+                    <select class="filter-select" id="countryFilter">
+                        <option value="all">Tüm Ülkeler</option>
+                        <option value="TR">Türkiye</option>
+                        <option value="US">Amerika</option>
+                        <option value="GB">İngiltere</option>
+                        <option value="DE">Almanya</option>
+                        <option value="FR">Fransa</option>
+                        <option value="NL">Hollanda</option>
+                        <option value="RU">Rusya</option>
+                        <option value="CN">Çin</option>
+                        <option value="JP">Japonya</option>
+                        <option value="IN">Hindistan</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Sıralama</label>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="points">Puana Göre</option>
+                        <option value="solved">Çözüm Sayısına Göre</option>
+                        <option value="accuracy">Başarı Yüzdesine Göre</option>
+                    </select>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn-filter" onclick="applyFilters()">
+                    <i class="fas fa-check"></i> Uygula
+                </button>
+                <button class="btn-reset" onclick="resetFilters()">
+                    <i class="fas fa-undo"></i> Sıfırla
+                </button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Tablosu -->
+        <div class="leaderboard-section">
+            <div class="leaderboard-header">
+                <div class="leaderboard-stats">
+                    <div class="leaderboard-stat">
+                        <div class="leaderboard-stat-value">10,482</div>
+                        <div class="leaderboard-stat-label">Aktif Hacker</div>
+                    </div>
+                    <div class="leaderboard-stat">
+                        <div class="leaderboard-stat-value">124,893</div>
+                        <div class="leaderboard-stat-label">Toplam Çözüm</div>
+                    </div>
+                    <div class="leaderboard-stat">
+                        <div class="leaderboard-stat-value">98.3K</div>
+                        <div class="leaderboard-stat-label">Toplam Puan</div>
+                    </div>
+                </div>
+                <div class="leaderboard-update">
+                    <i class="fas fa-sync-alt"></i> Son güncelleme: 2 dakika önce
+                </div>
+            </div>
+
+            <table class="leaderboard-table" id="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Hacker</th>
+                        <th>Ülke</th>
+                        <th>Puan</th>
+                        <th>Çözüm</th>
+                        <th>Başarı</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- JavaScript ile doldurulacak -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <ul class="pagination" id="pagination"></ul>
+
+        <!-- İstatistik Kartları -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-title">En Hızlı Yükselen</div>
+                <div class="stat-main">@new_hacker</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +124 sıra
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-title">En Çok VIP</div>
+                <div class="stat-main">@vip_master</div>
+                <div class="stat-change">
+                    45 VIP çözüm
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <div class="stat-title">Son 24 Saat</div>
+                <div class="stat-main">1,247</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +12% artış
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-title">Yeni Katılanlar</div>
+                <div class="stat-main">+342</div>
+                <div class="stat-change positive">
+                    Bugün
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HACKLAB</h3>
+                <p>Güvenlik araştırmacıları ve etik hacker'lar için CTF platformu.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Linkler</h3>
+                <ul>
+                    <li><a href="/machines">Tüm Makineler</a></li>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/forum">Forum</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Destek</h3>
+                <ul>
+                    <li><a href="/faq">SSS</a></li>
+                    <li><a href="/contact">İletişim</a></li>
+                    <li><a href="/discord">Discord</a></li>
+                    <li><a href="/docs">Dokümantasyon</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yasal</h3>
+                <ul>
+                    <li><a href="/terms">Kullanım Şartları</a></li>
+                    <li><a href="/privacy">Gizlilik Politikası</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mock leaderboard verisi
+        const leaderboardData = [
+            {
+                rank: 1,
+                username: "@cyber_ghost",
+                avatar: "https://www.gravatar.com/avatar/22222222222222222222222222222222?d=mp&f=y",
+                country: "TR",
+                countryName: "Türkiye",
+                points: 15420,
+                solved: 156,
+                accuracy: 99,
+                trend: "up",
+                trendValue: 0,
+                isVIP: true,
+                isCurrentUser: false
+            },
+            {
+                rank: 2,
+                username: "@root_hunter",
+                avatar: "https://www.gravatar.com/avatar/11111111111111111111111111111111?d=mp&f=y",
+                country: "US",
+                countryName: "Amerika",
+                points: 14890,
+                solved: 148,
+                accuracy: 98,
+                trend: "up",
+                trendValue: 2,
+                isVIP: true,
+                isCurrentUser: false
+            },
+            {
+                rank: 3,
+                username: "@byte_bender",
+                avatar: "https://www.gravatar.com/avatar/33333333333333333333333333333333?d=mp&f=y",
+                country: "DE",
+                countryName: "Almanya",
+                points: 14210,
+                solved: 142,
+                accuracy: 95,
+                trend: "down",
+                trendValue: -1,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 4,
+                username: "@payload_master",
+                avatar: "https://www.gravatar.com/avatar/44444444444444444444444444444444?d=mp&f=y",
+                country: "GB",
+                countryName: "İngiltere",
+                points: 13750,
+                solved: 135,
+                accuracy: 93,
+                trend: "up",
+                trendValue: 3,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 5,
+                username: "@shell_shocker",
+                avatar: "https://www.gravatar.com/avatar/55555555555555555555555555555555?d=mp&f=y",
+                country: "RU",
+                countryName: "Rusya",
+                points: 13120,
+                solved: 129,
+                accuracy: 91,
+                trend: "same",
+                trendValue: 0,
+                isVIP: true,
+                isCurrentUser: false
+            },
+            {
+                rank: 6,
+                username: "@binary_breaker",
+                avatar: "https://www.gravatar.com/avatar/66666666666666666666666666666666?d=mp&f=y",
+                country: "FR",
+                countryName: "Fransa",
+                points: 12890,
+                solved: 124,
+                accuracy: 89,
+                trend: "up",
+                trendValue: 1,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 7,
+                username: "@null_pointer",
+                avatar: "https://www.gravatar.com/avatar/77777777777777777777777777777777?d=mp&f=y",
+                country: "NL",
+                countryName: "Hollanda",
+                points: 12560,
+                solved: 118,
+                accuracy: 87,
+                trend: "down",
+                trendValue: -2,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 8,
+                username: "@stack_smasher",
+                avatar: "https://www.gravatar.com/avatar/88888888888888888888888888888888?d=mp&f=y",
+                country: "CN",
+                countryName: "Çin",
+                points: 12340,
+                solved: 112,
+                accuracy: 85,
+                trend: "up",
+                trendValue: 4,
+                isVIP: true,
+                isCurrentUser: false
+            },
+            {
+                rank: 9,
+                username: "@hex_hacker",
+                avatar: "https://www.gravatar.com/avatar/99999999999999999999999999999999?d=mp&f=y",
+                country: "JP",
+                countryName: "Japonya",
+                points: 12120,
+                solved: 108,
+                accuracy: 84,
+                trend: "same",
+                trendValue: 0,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 10,
+                username: "@reverse_engineer",
+                avatar: "https://www.gravatar.com/avatar/10101010101010101010101010101010?d=mp&f=y",
+                country: "IN",
+                countryName: "Hindistan",
+                points: 11980,
+                solved: 105,
+                accuracy: 82,
+                trend: "up",
+                trendValue: 2,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 11,
+                username: "@current_user",
+                avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+                country: "TR",
+                countryName: "Türkiye",
+                points: 11540,
+                solved: 98,
+                accuracy: 79,
+                trend: "up",
+                trendValue: 5,
+                isVIP: false,
+                isCurrentUser: true
+            },
+            {
+                rank: 12,
+                username: "@crypto_cracker",
+                avatar: "https://www.gravatar.com/avatar/12121212121212121212121212121212?d=mp&f=y",
+                country: "BR",
+                countryName: "Brezilya",
+                points: 11320,
+                solved: 94,
+                accuracy: 76,
+                trend: "down",
+                trendValue: -1,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 13,
+                username: "@web_warrior",
+                avatar: "https://www.gravatar.com/avatar/13131313131313131313131313131313?d=mp&f=y",
+                country: "AU",
+                countryName: "Avustralya",
+                points: 11150,
+                solved: 91,
+                accuracy: 74,
+                trend: "up",
+                trendValue: 3,
+                isVIP: false,
+                isCurrentUser: false
+            },
+            {
+                rank: 14,
+                username: "@forensic_fox",
+                avatar: "https://www.gravatar.com/avatar/14141414141414141414141414141414?d=mp&f=y",
+                country: "CA",
+                countryName: "Kanada",
+                points: 10980,
+                solved: 88,
+                accuracy: 72,
+                trend: "same",
+                trendValue: 0,
+                isVIP: true,
+                isCurrentUser: false
+            },
+            {
+                rank: 15,
+                username: "@wire_shark",
+                avatar: "https://www.gravatar.com/avatar/15151515151515151515151515151515?d=mp&f=y",
+                country: "SE",
+                countryName: "İsveç",
+                points: 10790,
+                solved: 85,
+                accuracy: 70,
+                trend: "down",
+                trendValue: -2,
+                isVIP: false,
+                isCurrentUser: false
+            }
+        ];
+
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredData = [...leaderboardData];
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            renderLeaderboard();
+            renderPagination();
+            checkUserStatus();
+        });
+
+        // Leaderboard'u render et
+        function renderLeaderboard() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+            
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = pageData.map(user => createLeaderboardRow(user)).join('');
+        }
+
+        // Leaderboard satırı oluştur
+        function createLeaderboardRow(user) {
+            const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
+            const trendIcon = getTrendIcon(user.trend);
+            const trendClass = user.trend === 'up' ? 'rank-up' : user.trend === 'down' ? 'rank-down' : 'rank-same';
+            
+            return `
+                <tr onclick="viewProfile('${user.username}')" ${user.isCurrentUser ? 'style="background: rgba(0, 255, 157, 0.05);"' : ''}>
+                    <td class="rank-cell">
+                        <span class="${rankClass}">${user.rank}</span>
+                        ${user.trendValue !== 0 ? `
+                            <span class="rank-change ${trendClass}">
+                                <i class="fas fa-${trendIcon}"></i> ${Math.abs(user.trendValue)}
+                            </span>
+                        ` : ''}
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <img src="${user.avatar}" alt="${user.username}" class="user-avatar-small">
+                            <div class="user-info">
+                                <span class="user-name">
+                                    ${user.username}
+                                    ${user.isVIP ? '<span class="vip-badge">VIP</span>' : ''}
+                                    ${user.isCurrentUser ? '<span style="color: #00ff9d; font-size: 0.7rem; margin-left: 0.5rem;">(sen)</span>' : ''}
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <img src="https://flagcdn.com/20x15/${user.country.toLowerCase()}.png" 
+                             srcset="https://flagcdn.com/40x30/${user.country.toLowerCase()}.png 2x"
+                             alt="${user.countryName}"
+                             class="country-flag">
+                        ${user.countryName}
+                    </td>
+                    <td class="points-cell">${user.points.toLocaleString()}</td>
+                    <td class="solved-cell">${user.solved}</td>
+                    <td class="accuracy-cell">%${user.accuracy}</td>
+                    <td>
+                        <span class="trend-indicator ${trendClass}">
+                            <i class="fas fa-${trendIcon}"></i>
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Trend ikonu al
+        function getTrendIcon(trend) {
+            switch(trend) {
+                case 'up': return 'arrow-up';
+                case 'down': return 'arrow-down';
+                default: return 'minus';
+            }
+        }
+
+        // Pagination render
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            let html = '';
+            
+            // Previous button
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `
+                        <li class="page-item">
+                            <a class="page-link ${i === currentPage ? 'active' : ''}" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<li class="page-dots">...</li>`;
+                }
+            }
+            
+            // Next button
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        // Sayfa değiştir
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            renderLeaderboard();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filtreleri uygula
+        function applyFilters() {
+            const timeFilter = document.getElementById('timeFilter').value;
+            const countryFilter = document.getElementById('countryFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            // Filtreleme (mock - gerçek uygulamada API'den veri çekilir)
+            filteredData = [...leaderboardData];
+            
+            // Ülke filtresi
+            if (countryFilter !== 'all') {
+                filteredData = filteredData.filter(user => user.country === countryFilter);
+            }
+            
+            // Sıralama
+            switch(sortFilter) {
+                case 'points':
+                    filteredData.sort((a, b) => b.points - a.points);
+                    break;
+                case 'solved':
+                    filteredData.sort((a, b) => b.solved - a.solved);
+                    break;
+                case 'accuracy':
+                    filteredData.sort((a, b) => b.accuracy - a.accuracy);
+                    break;
+            }
+            
+            // Rank'leri güncelle
+            filteredData.forEach((user, index) => {
+                user.rank = index + 1;
+            });
+            
+            currentPage = 1;
+            renderLeaderboard();
+            renderPagination();
+        }
+
+        // Filtreleri sıfırla
+        function resetFilters() {
+            document.getElementById('timeFilter').value = 'all';
+            document.getElementById('countryFilter').value = 'all';
+            document.getElementById('sortFilter').value = 'points';
+            
+            filteredData = [...leaderboardData];
+            currentPage = 1;
+            renderLeaderboard();
+            renderPagination();
+        }
+
+        // Profil görüntüle
+        function viewProfile(username) {
+            window.location.href = `/profile/${username}`;
+        }
+
+        // Kullanıcı durumunu kontrol et
+        function checkUserStatus() {
+            const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+            if (!token) {
+                // Guest kullanıcı
+                document.getElementById('userPoints').innerHTML = '👤 Misafir';
+            }
+        }
+
+        // Otomatik yenileme (opsiyonel)
+        setInterval(() => {
+            // Leaderboard'u yenile
+            console.log('Leaderboard yenileniyor...');
+        }, 60000); // 1 dakika
+    </script>
+</body>
+</html>

@@ -1,0 +1,1176 @@
+{{define "content"}}
+<div class="stats-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <h2><i class="fas fa-chart-bar"></i> Sistem İstatistikleri</h2>
+            <p>Platformun detaylı istatistiklerini görüntüleyin</p>
+        </div>
+        <div class="header-right">
+            <div class="date-range">
+                <select id="dateRange" onchange="changeDateRange()">
+                    <option value="7">Son 7 Gün</option>
+                    <option value="30" selected>Son 30 Gün</option>
+                    <option value="90">Son 3 Ay</option>
+                    <option value="365">Son 1 Yıl</option>
+                    <option value="all">Tüm Zamanlar</option>
+                </select>
+                <button class="btn-primary" onclick="exportStats()">
+                    <i class="fas fa-download"></i> Dışa Aktar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Özet Kartları -->
+    <div class="summary-cards">
+        <div class="summary-card" onclick="showDetail('users')">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <div class="card-content">
+                <div class="card-value" id="totalUsers">0</div>
+                <div class="card-label">Toplam Kullanıcı</div>
+                <div class="card-trend" id="userTrend">
+                    <i class="fas fa-arrow-up"></i> +0% 
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-card" onclick="showDetail('machines')">
+            <div class="card-icon"><i class="fas fa-server"></i></div>
+            <div class="card-content">
+                <div class="card-value" id="totalMachines">0</div>
+                <div class="card-label">Toplam Makine</div>
+                <div class="card-trend" id="machineTrend">
+                    <i class="fas fa-arrow-up"></i> +0%
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-card" onclick="showDetail('submissions')">
+            <div class="card-icon"><i class="fas fa-flag"></i></div>
+            <div class="card-content">
+                <div class="card-value" id="totalSubmissions">0</div>
+                <div class="card-label">Toplam Çözüm</div>
+                <div class="card-trend" id="submissionTrend">
+                    <i class="fas fa-arrow-up"></i> +0%
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-card" onclick="showDetail('success')">
+            <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="card-content">
+                <div class="card-value" id="successRate">0%</div>
+                <div class="card-label">Başarı Oranı</div>
+                <div class="card-trend" id="successTrend">
+                    <i class="fas fa-arrow-up"></i> +0%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ana Grafikler -->
+    <div class="charts-grid">
+        <!-- Aktivite Grafiği -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-line"></i> Platform Aktivitesi
+                </h3>
+                <div class="chart-legend">
+                    <span class="legend-item">
+                        <span class="legend-color" style="background: #00ff9d;"></span>
+                        Kullanıcı
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-color" style="background: #ffbd2e;"></span>
+                        Çözüm
+                    </span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Kullanıcı Dağılımı -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i> Kullanıcı Dağılımı
+                </h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="userDistributionChart"></canvas>
+            </div>
+            <div class="chart-legend-grid" id="userDistributionLegend"></div>
+        </div>
+    </div>
+
+    <!-- İkinci Satır Grafikler -->
+    <div class="charts-grid">
+        <!-- Zorluk Dağılımı -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i> Makine Zorluk Dağılımı
+                </h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="difficultyChart"></canvas>
+            </div>
+            <div class="chart-legend-grid" id="difficultyLegend"></div>
+        </div>
+
+        <!-- Popüler Makineler -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-fire"></i> En Popüler Makineler
+                </h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="popularMachinesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detaylı İstatistikler -->
+    <div class="stats-grid">
+        <!-- Kullanıcı İstatistikleri -->
+        <div class="stats-section">
+            <h3 class="section-title">
+                <i class="fas fa-users"></i> Kullanıcı İstatistikleri
+            </h3>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span class="stat-label">Aktif Kullanıcılar (24s)</span>
+                    <span class="stat-value" id="activeUsers">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Yeni Kullanıcılar (Bugün)</span>
+                    <span class="stat-value" id="newUsersToday">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Yeni Kullanıcılar (Bu Hafta)</span>
+                    <span class="stat-value" id="newUsersWeek">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Yeni Kullanıcılar (Bu Ay)</span>
+                    <span class="stat-value" id="newUsersMonth">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">VIP Kullanıcılar</span>
+                    <span class="stat-value" id="vipUsers">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ortalama Kullanıcı Puanı</span>
+                    <span class="stat-value" id="avgUserPoints">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">En Yüksek Puan</span>
+                    <span class="stat-value" id="topUserPoints">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ülke Sayısı</span>
+                    <span class="stat-value" id="countryCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Makine İstatistikleri -->
+        <div class="stats-section">
+            <h3 class="section-title">
+                <i class="fas fa-server"></i> Makine İstatistikleri
+            </h3>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span class="stat-label">Aktif Makineler</span>
+                    <span class="stat-value" id="activeMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Kolay Makineler</span>
+                    <span class="stat-value" id="easyMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Orta Makineler</span>
+                    <span class="stat-value" id="mediumMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Zor Makineler</span>
+                    <span class="stat-value" id="hardMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Uzman Makineler</span>
+                    <span class="stat-value" id="expertMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">VIP Makineler</span>
+                    <span class="stat-value" id="vipMachines">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Toplam Soru</span>
+                    <span class="stat-value" id="totalQuestions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ortalama Soru/Makine</span>
+                    <span class="stat-value" id="avgQuestionsPerMachine">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Çözüm İstatistikleri -->
+        <div class="stats-section">
+            <h3 class="section-title">
+                <i class="fas fa-flag"></i> Çözüm İstatistikleri
+            </h3>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span class="stat-label">Başarılı Çözümler</span>
+                    <span class="stat-value" id="acceptedSubmissions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Başarısız Çözümler</span>
+                    <span class="stat-value" id="rejectedSubmissions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Bugünkü Çözümler</span>
+                    <span class="stat-value" id="todaySubmissions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Bu Haftaki Çözümler</span>
+                    <span class="stat-value" id="weekSubmissions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Bu Ayki Çözümler</span>
+                    <span class="stat-value" id="monthSubmissions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ortalama Çözüm/Kullanıcı</span>
+                    <span class="stat-value" id="avgSubmissionsPerUser">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">En Çok Çözen Kullanıcı</span>
+                    <span class="stat-value" id="topSolver">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">En Çok Çözülen Makine</span>
+                    <span class="stat-value" id="topMachine">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP İstatistikleri -->
+    <div class="vip-stats-section">
+        <h3 class="section-title">
+            <i class="fas fa-crown"></i> VIP İstatistikleri
+        </h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-crown"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalVIPUsers">0</div>
+                    <div class="stat-label">Toplam VIP</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalVIPRevenue">₺0</div>
+                    <div class="stat-label">Toplam Gelir</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="monthlyVIPRevenue">₺0</div>
+                    <div class="stat-label">Aylık Gelir</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="avgVIPDuration">0</div>
+                    <div class="stat-label">Ort. VIP Süresi (Gün)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIP Satış Grafiği -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-bar"></i> VIP Satışları
+                </h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="vipSalesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coğrafi Dağılım -->
+    <div class="geo-section">
+        <h3 class="section-title">
+            <i class="fas fa-globe"></i> Coğrafi Dağılım
+        </h3>
+        <div class="geo-grid">
+            <div class="geo-map">
+                <canvas id="worldMap" style="width: 100%; height: 300px;"></canvas>
+            </div>
+            <div class="country-list">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ülke</th>
+                            <th>Kullanıcı Sayısı</th>
+                            <th>Yüzde</th>
+                        </tr>
+                    </thead>
+                    <tbody id="countryStats">
+                        <tr>
+                            <td colspan="3" class="text-center">Yükleniyor...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zaman Serisi Tablosu -->
+    <div class="time-series">
+        <h3 class="section-title">
+            <i class="fas fa-clock"></i> Zaman Serisi Verileri
+        </h3>
+        <div class="table-container">
+            <table class="data-table" id="timeSeriesTable">
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Yeni Kullanıcı</th>
+                        <th>Aktif Kullanıcı</th>
+                        <th>Toplam Çözüm</th>
+                        <th>Başarılı Çözüm</th>
+                        <th>Başarı Oranı</th>
+                    </tr>
+                </thead>
+                <tbody id="timeSeriesBody">
+                    <tr>
+                        <td colspan="6" class="text-center">Yükleniyor...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detay Modalı -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="detailModalTitle">Detaylı İstatistikler</h3>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- İçerik dinamik doldurulacak -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-page {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        margin-bottom: 0.3rem;
+    }
+
+    .header-left p {
+        color: #6a7a8a;
+        font-size: 0.9rem;
+    }
+
+    .date-range {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .date-range select {
+        padding: 0.5rem 2rem 0.5rem 1rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #00ff9d;
+        border-radius: 8px;
+        color: #e0e0e0;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        padding: 0.5rem 1.5rem;
+        background: linear-gradient(45deg, #00ff9d, #00b86e);
+        border: none;
+        border-radius: 8px;
+        color: #0a0f0f;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .summary-card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-3px);
+        border-color: #00ff9d;
+        box-shadow: 0 10px 30px rgba(0, 255, 157, 0.2);
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 255, 157, 0.1);
+        border: 1px solid #00ff9d;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #00ff9d;
+    }
+
+    .card-content {
+        flex: 1;
+    }
+
+    .card-value {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 2rem;
+        color: #00ff9d;
+        line-height: 1.2;
+    }
+
+    .card-label {
+        color: #b0b0b0;
+        font-size: 0.9rem;
+    }
+
+    .card-trend {
+        font-size: 0.8rem;
+        margin-top: 0.3rem;
+    }
+
+    .card-trend i {
+        margin-right: 0.3rem;
+    }
+
+    .card-trend .fa-arrow-up { color: #00ff9d; }
+    .card-trend .fa-arrow-down { color: #ff5f56; }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .chart-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .chart-title {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-size: 1.1rem;
+    }
+
+    .chart-title i {
+        margin-right: 0.5rem;
+    }
+
+    .chart-legend {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        color: #b0b0b0;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+
+    .chart-container {
+        height: 250px;
+        position: relative;
+    }
+
+    .chart-legend-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #2a3a4a;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .stats-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .section-title i {
+        margin-right: 0.5rem;
+    }
+
+    .stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-label {
+        color: #b0b0b0;
+        font-size: 0.9rem;
+    }
+
+    .stat-value {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff9d;
+        font-weight: 600;
+    }
+
+    .vip-stats-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a3a4a;
+        border-radius: 10px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-card .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.3rem;
+    }
+
+    .geo-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .geo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .country-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .time-series {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #2a3a4a;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: rgba(0, 255, 157, 0.1);
+        padding: 0.8rem;
+        text-align: left;
+        color: #b0b0b0;
+        font-size: 0.8rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .data-table td {
+        padding: 0.8rem;
+        border-bottom: 1px solid #2a3a4a;
+    }
+
+    .data-table tr:hover {
+        background: rgba(0, 255, 157, 0.05);
+    }
+
+    .text-center {
+        text-align: center;
+        color: #6a7a8a;
+        padding: 2rem;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+        background: #1a1f2f;
+        margin: 5% auto;
+        border: 1px solid #00ff9d;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 800px;
+    }
+
+    .modal-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #2a3a4a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        color: #00ff9d;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #6a7a8a;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .geo-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let activityChart, userDistributionChart, difficultyChart, popularMachinesChart, vipSalesChart;
+    let currentDateRange = 30;
+
+    // Sayfa yüklendiğinde
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStats();
+    });
+
+    // Tarih aralığı değiştir
+    function changeDateRange() {
+        currentDateRange = document.getElementById('dateRange').value;
+        loadStats();
+    }
+
+    // Tüm istatistikleri yükle
+    async function loadStats() {
+        try {
+            const response = await fetch(`/admin/api/stats?days=${currentDateRange}`);
+            const data = await response.json();
+            
+            // Özet kartları güncelle
+            updateSummaryCards(data.summary);
+            
+            // Grafikleri güncelle
+            updateCharts(data.charts);
+            
+            // Detaylı istatistikleri güncelle
+            updateDetailedStats(data.detailed);
+            
+            // Zaman serisi tablosunu güncelle
+            updateTimeSeries(data.timeseries);
+            
+            // Coğrafi dağılımı güncelle
+            updateCountryStats(data.countries);
+            
+        } catch (error) {
+            console.error('İstatistikler yüklenemedi:', error);
+        }
+    }
+
+    // Özet kartlarını güncelle
+    function updateSummaryCards(summary) {
+        document.getElementById('totalUsers').textContent = summary.total_users || 0;
+        document.getElementById('totalMachines').textContent = summary.total_machines || 0;
+        document.getElementById('totalSubmissions').textContent = summary.total_submissions || 0;
+        document.getElementById('successRate').textContent = (summary.success_rate || 0).toFixed(1) + '%';
+        
+        // Trendleri güncelle
+        updateTrend('userTrend', summary.user_trend);
+        updateTrend('machineTrend', summary.machine_trend);
+        updateTrend('submissionTrend', summary.submission_trend);
+        updateTrend('successTrend', summary.success_trend);
+    }
+
+    function updateTrend(elementId, trend) {
+        const el = document.getElementById(elementId);
+        if (trend > 0) {
+            el.innerHTML = `<i class="fas fa-arrow-up"></i> +${trend}%`;
+            el.style.color = '#00ff9d';
+        } else if (trend < 0) {
+            el.innerHTML = `<i class="fas fa-arrow-down"></i> ${trend}%`;
+            el.style.color = '#ff5f56';
+        } else {
+            el.innerHTML = `<i class="fas fa-minus"></i> 0%`;
+            el.style.color = '#6a7a8a';
+        }
+    }
+
+    // Grafikleri güncelle
+    function updateCharts(charts) {
+        // Aktivite Grafiği
+        if (activityChart) activityChart.destroy();
+        activityChart = new Chart(document.getElementById('activityChart'), {
+            type: 'line',
+            data: {
+                labels: charts.activity.labels,
+                datasets: [{
+                    label: 'Kullanıcı',
+                    data: charts.activity.users,
+                    borderColor: '#00ff9d',
+                    backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Çözüm',
+                    data: charts.activity.submissions,
+                    borderColor: '#ffbd2e',
+                    backgroundColor: 'rgba(255, 189, 46, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: getChartOptions()
+        });
+
+        // Kullanıcı Dağılımı
+        if (userDistributionChart) userDistributionChart.destroy();
+        userDistributionChart = new Chart(document.getElementById('userDistributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: charts.userDistribution.labels,
+                datasets: [{
+                    data: charts.userDistribution.data,
+                    backgroundColor: ['#00ff9d', '#ffbd2e', '#00b8ff', '#6a7a8a'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Legend'ı güncelle
+        updateLegend('userDistributionLegend', charts.userDistribution.labels, 
+                    ['#00ff9d', '#ffbd2e', '#00b8ff', '#6a7a8a'], charts.userDistribution.data);
+
+        // Zorluk Dağılımı
+        if (difficultyChart) difficultyChart.destroy();
+        difficultyChart = new Chart(document.getElementById('difficultyChart'), {
+            type: 'doughnut',
+            data: {
+                labels: charts.difficulty.labels,
+                datasets: [{
+                    data: charts.difficulty.data,
+                    backgroundColor: ['#00ff9d', '#ffbd2e', '#ff5f56', '#ff0055'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        updateLegend('difficultyLegend', charts.difficulty.labels, 
+                    ['#00ff9d', '#ffbd2e', '#ff5f56', '#ff0055'], charts.difficulty.data);
+
+        // Popüler Makineler
+        if (popularMachinesChart) popularMachinesChart.destroy();
+        popularMachinesChart = new Chart(document.getElementById('popularMachinesChart'), {
+            type: 'bar',
+            data: {
+                labels: charts.popularMachines.labels,
+                datasets: [{
+                    label: 'Çözüm Sayısı',
+                    data: charts.popularMachines.data,
+                    backgroundColor: '#00ff9d',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#2a3a4a' },
+                        ticks: { color: '#b0b0b0' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#b0b0b0' }
+                    }
+                }
+            }
+        });
+
+        // VIP Satış Grafiği
+        if (vipSalesChart) vipSalesChart.destroy();
+        vipSalesChart = new Chart(document.getElementById('vipSalesChart'), {
+            type: 'bar',
+            data: {
+                labels: charts.vipSales.labels,
+                datasets: [{
+                    label: 'Satış Miktarı (₺)',
+                    data: charts.vipSales.data,
+                    backgroundColor: '#ffd700',
+                    borderRadius: 5
+                }]
+            },
+            options: getChartOptions()
+        });
+    }
+
+    function getChartOptions() {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#b0b0b0' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#2a3a4a' },
+                    ticks: { color: '#b0b0b0' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#b0b0b0' }
+                }
+            }
+        };
+    }
+
+    function updateLegend(elementId, labels, colors, data) {
+        const legend = document.getElementById(elementId);
+        let html = '';
+        const total = data.reduce((a, b) => a + b, 0);
+        
+        labels.forEach((label, i) => {
+            const percentage = ((data[i] / total) * 100).toFixed(1);
+            html += `
+                <div class="legend-item">
+                    <span class="legend-color" style="background: ${colors[i]}"></span>
+                    <span class="legend-label">${label}</span>
+                    <span class="legend-value">${data[i]} (${percentage}%)</span>
+                </div>
+            `;
+        });
+        
+        legend.innerHTML = html;
+    }
+
+    // Detaylı istatistikleri güncelle
+    function updateDetailedStats(stats) {
+        // Kullanıcı istatistikleri
+        document.getElementById('activeUsers').textContent = stats.active_users || 0;
+        document.getElementById('newUsersToday').textContent = stats.new_users_today || 0;
+        document.getElementById('newUsersWeek').textContent = stats.new_users_week || 0;
+        document.getElementById('newUsersMonth').textContent = stats.new_users_month || 0;
+        document.getElementById('vipUsers').textContent = stats.vip_users || 0;
+        document.getElementById('avgUserPoints').textContent = (stats.avg_user_points || 0).toFixed(1);
+        document.getElementById('topUserPoints').textContent = stats.top_user_points || 0;
+        document.getElementById('countryCount').textContent = stats.country_count || 0;
+
+        // Makine istatistikleri
+        document.getElementById('activeMachines').textContent = stats.active_machines || 0;
+        document.getElementById('easyMachines').textContent = stats.easy_machines || 0;
+        document.getElementById('mediumMachines').textContent = stats.medium_machines || 0;
+        document.getElementById('hardMachines').textContent = stats.hard_machines || 0;
+        document.getElementById('expertMachines').textContent = stats.expert_machines || 0;
+        document.getElementById('vipMachines').textContent = stats.vip_machines || 0;
+        document.getElementById('totalQuestions').textContent = stats.total_questions || 0;
+        
+        const avgQuestions = stats.total_machines ? 
+            (stats.total_questions / stats.total_machines).toFixed(1) : 0;
+        document.getElementById('avgQuestionsPerMachine').textContent = avgQuestions;
+
+        // Çözüm istatistikleri
+        document.getElementById('acceptedSubmissions').textContent = stats.accepted_submissions || 0;
+        document.getElementById('rejectedSubmissions').textContent = stats.rejected_submissions || 0;
+        document.getElementById('todaySubmissions').textContent = stats.today_submissions || 0;
+        document.getElementById('weekSubmissions').textContent = stats.week_submissions || 0;
+        document.getElementById('monthSubmissions').textContent = stats.month_submissions || 0;
+        
+        const avgSubs = stats.total_users ? 
+            (stats.total_submissions / stats.total_users).toFixed(1) : 0;
+        document.getElementById('avgSubmissionsPerUser').textContent = avgSubs;
+        
+        document.getElementById('topSolver').textContent = stats.top_solver || '-';
+        document.getElementById('topMachine').textContent = stats.top_machine || '-';
+
+        // VIP istatistikleri
+        document.getElementById('totalVIPUsers').textContent = stats.total_vip_users || 0;
+        document.getElementById('totalVIPRevenue').textContent = '₺' + (stats.total_vip_revenue || 0).toFixed(2);
+        document.getElementById('monthlyVIPRevenue').textContent = '₺' + (stats.monthly_vip_revenue || 0).toFixed(2);
+        document.getElementById('avgVIPDuration').textContent = (stats.avg_vip_duration || 0).toFixed(1);
+    }
+
+    // Zaman serisi tablosunu güncelle
+    function updateTimeSeries(data) {
+        const tbody = document.getElementById('timeSeriesBody');
+        
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Veri bulunamadı</td></tr>';
+            return;
+        }
+
+        let html = '';
+        data.forEach(row => {
+            html += `
+                <tr>
+                    <td>${row.date}</td>
+                    <td>${row.new_users}</td>
+                    <td>${row.active_users}</td>
+                    <td>${row.total_submissions}</td>
+                    <td>${row.accepted_submissions}</td>
+                    <td>${row.success_rate.toFixed(1)}%</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    // Coğrafi dağılımı güncelle
+    function updateCountryStats(countries) {
+        const tbody = document.getElementById('countryStats');
+        
+        if (!countries || countries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">Veri bulunamadı</td></tr>';
+            return;
+        }
+
+        const total = countries.reduce((sum, c) => sum + c.count, 0);
+        let html = '';
+        
+        countries.forEach(country => {
+            const percentage = ((country.count / total) * 100).toFixed(1);
+            html += `
+                <tr>
+                    <td>${country.name}</td>
+                    <td>${country.count}</td>
+                    <td>${percentage}%</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    // Detay göster
+    function showDetail(type) {
+        const modal = document.getElementById('detailModal');
+        const title = document.getElementById('detailModalTitle');
+        const body = document.getElementById('detailModalBody');
+        
+        title.textContent = type === 'users' ? 'Kullanıcı Detayları' :
+                           type === 'machines' ? 'Makine Detayları' :
+                           type === 'submissions' ? 'Çözüm Detayları' :
+                           'Başarı Detayları';
+        
+        // Detay içeriğini yükle
+        loadDetailData(type);
+        
+        modal.style.display = 'block';
+    }
+
+    async function loadDetailData(type) {
+        try {
+            const response = await fetch(`/admin/api/stats/detail?type=${type}&days=${currentDateRange}`);
+            const data = await response.json();
+            
+            const body = document.getElementById('detailModalBody');
+            // Detay içeriğini formatla
+            body.innerHTML = formatDetailData(type, data);
+            
+        } catch (error) {
+            console.error('Detay verileri yüklenemedi:', error);
+        }
+    }
+
+    function formatDetailData(type, data) {
+        // Detay verilerini formatla
+        return '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    // İstatistikleri dışa aktar
+    async function exportStats() {
+        try {
+            const response = await fetch(`/admin/api/stats/export?days=${currentDateRange}`);
+            const blob = await response.blob();
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `stats-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            console.error('İstatistikler dışa aktarılamadı:', error);
+        }
+    }
+
+    // Modal dışına tıklanınca kapat
+    window.onclick = function(event) {
+        const modal = document.getElementById('detailModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+{{end}}
